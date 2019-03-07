@@ -6,7 +6,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <GLUT/GLUT.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 //--------------------------------- Definir cores
 #define BLUE     0.0, 0.0, 1.0, 1.0
