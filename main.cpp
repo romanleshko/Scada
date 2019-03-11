@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
-
+#endif
 
 #define BLUE     0.0, 0.0, 1.0, 1.0
 #define RED         1.0, 0.0, 0.0, 1.0
