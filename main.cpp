@@ -19,7 +19,6 @@
 
 
 static GLfloat vertices[]={
-
     -1,  0,  1,    
     -1,  0, -1,    
     1,  0, -1,    
@@ -113,11 +112,7 @@ void drawEixos()
 }
 
 
-
-
-void drawScene(){
-    
-    
+void drawStairs() {
     for (int i = 0; i < N_STAIRS; i++) {
        
         glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT *2, 0);
@@ -137,10 +132,13 @@ void drawScene(){
             
         glPopMatrix();
 
-        
     }
+}
 
+void drawScene(){
     
+    drawStairs();
+   
 }
 
 void display(void){
