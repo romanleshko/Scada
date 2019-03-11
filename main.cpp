@@ -1,8 +1,3 @@
-
-//  jh/pm - Fevereiro 2018
-//          Pesquisar ??
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
