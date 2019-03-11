@@ -7,7 +7,6 @@
 #include <GL/glut.h>
 #endif
 
-//--------------------------------- Definir cores
 #define BLUE     0.0, 0.0, 1.0, 1.0
 #define RED         1.0, 0.0, 0.0, 1.0
 #define YELLOW     1.0, 1.0, 0.0, 1.0
@@ -16,69 +15,38 @@
 #define BLACK    0.0, 0.0, 0.0, 1.0
 #define PI         3.14159
 
-//================================================================================
-//===========================================================Variaveis e constantes
 
-GLfloat tam=2.0;
 static GLfloat vertices[]={
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ x=tam (Esquerda)
-    -tam,  -tam,  tam,    // 0
-    -tam,   tam,  tam,    // 1
-    -tam,   tam, -tam,    // 2
-    -tam,  -tam, -tam,    // 3
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ Direita
-    tam,  -tam,  tam,    // 4
-    tam,   tam,  tam,    // 5
-    tam,   tam, -tam,    // 6
-    tam,  -tam, -tam,    // 7
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ (Cima
-    -tam,  tam,  tam,    // 8
-    -tam,  tam, -tam,    // 9
-    tam,  tam, -tam,    // 10
-    tam,  tam,  tam,    // 11
+    -1,  0,  1,    
+    -1,  0, -1,    
+    1,  0, -1,    
+    1,  0,  1,    
 };
 
 static GLfloat normais[] = {
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ x=tam (Esquerda)
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0,
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ x=tam (Direita)
-    1.0,  0.0,  0.0,
-    1.0,  0.0,  0.0,
-    1.0,  0.0,  0.0,
-    1.0,  0.0,  0.0,
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ y=tam (Cima)
     0.0,  1.0,  0.0,
     0.0,  1.0,  0.0,
     0.0,  1.0,  0.0,
     0.0,  1.0,  0.0,
 };
-//------------------------------------------------------------ Cores
+
+
 static GLfloat cor[]={
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ x=tam (Esquerda) - Red
-    1.0,  0.0, 0.0,    // 0
-    1.0,  0.0, 0.0,    // 1
-    1.0,  1.0, 0.0,    // 2
-    1.0,  1.0, 0.0,    // 3
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ x=2*tam (Direita) - Green
-    0.0,  1.0, 1.0,    // 4
-    0.0,  1.0, 1.0,    // 5
-    0.0,  1.0, 0.0,    // 6
-    0.0,  1.0, 0.0,    // 7
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ y=tam (Cima) - Blue
-    0.0,  0.0, 1.0,    // 8
-    0.0,  0.0, 1.0,    // 9
-    1.0,  0.0, 1.0,    // 10
-    1.0,  0.0, 1.0,    // 11
+ 
+    0.0,  0.0, 1.0,   
+    0.0,  0.0, 1.0,    
+    1.0,  0.0, 1.0,    
+    1.0,  0.0, 1.0,   
 };
 
 //=========================================================== FACES DA MESA
 GLboolean   frenteVisivel=1;
-static GLuint   cima[] = {8,11, 10,  9};
-static GLuint   esquerda[] = {0, 1, 2, 3};
-static GLuint   direita[] = {4, 7, 6, 5};
+
+static GLuint   square[] = {0, 1, 2, 3};
+static GLuint   STAIR_WIDTH = 2.5;
+static GLuint   STAIR_LENGTH = 1.7;
+static GLuint   STAIR_HEIGHT = 1;
+static GLuint   N_STAIRS = 10;
 
 
 
@@ -104,10 +72,10 @@ void inicializa(void)
     glClearColor(BLACK);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖApagar
     glEnable(GL_DEPTH_TEST);    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖProfundidade
     glShadeModel(GL_SMOOTH);    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖInterpolacao de cores
-    
+    /*
     glEnable(GL_CULL_FACE);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖFaces visiveis
     glCullFace(GL_BACK);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖMostrar so as da frente
-    
+    */
     glVertexPointer(3, GL_FLOAT, 0, vertices); //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖVertex arrays
     glEnableClientState(GL_VERTEX_ARRAY);
     glNormalPointer(GL_FLOAT, 0, normais);
@@ -142,35 +110,33 @@ void drawEixos()
 }
 
 
+void drawStairs() {
+    for (int i = 0; i < N_STAIRS; i++) {
+       
+        glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT *2, 0);
+        glPushMatrix();
+             glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
 
+            glPushMatrix();
+                
+                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square);   
+            glPopMatrix();
+    
+            glPushMatrix();
+                glTranslatef(STAIR_LENGTH, STAIR_HEIGHT , 0);
+                glRotatef(90, 0 , 0, 1);
+                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square); 
+            glPopMatrix();
+            
+        glPopMatrix();
+
+    }
+}
 
 void drawScene(){
     
-    //=================================================== Qual o lado ?
-    if (frenteVisivel)
-        glCullFace(GL_BACK);  //glFrontFace(GL_CW);
-    else
-        glCullFace(GL_FRONT);  //glFrontFace(GL_CCW);
-    
-    
-    //==================================== MESA
-    //glColorPointer(3, GL_FLOAT, 0, cor);     podia ser modificada a cor !
-    glPushMatrix();
-        glTranslatef(0, 2, 0);
-    
-        glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda);
-        glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita);
-        glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima);
-    
-    
-        //==================================== PAralelipipedo Amarelo
-        glColor4f(YELLOW);
-        glPushMatrix();
-            //?? escala, rotacao, translacao ??
-            glutWireCube(1);
-        glPopMatrix();
-    glPopMatrix();
-    
+    drawStairs();
+   
 }
 
 void display(void){
