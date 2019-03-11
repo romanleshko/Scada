@@ -56,8 +56,9 @@ GLint        wScreen=800, hScreen=500;        //.. janela (pixeis)
 GLfloat        xC=10.0, yC=10.0, zC=10.0;        //.. Mundo  (unidades mundo)
 
 //------------------------------------------------------------ Observador
-GLfloat  rVisao=10, aVisao=0.5*PI, incVisao=0.05;
-GLfloat  obsP[] ={rVisao*cos(aVisao), 3.0, rVisao*sin(aVisao)};
+GLfloat  rVisao=5, aVisao=0.5*PI, incVisao=0.05;
+GLfloat  obsP[] ={-5, 3.0, -5};
+GLfloat  obsPfin[] ={obsP[0]-rVisao*cos(aVisao), obsP[1], obsP[2]-rVisao*sin(aVisao)};
 GLfloat  angZoom=90;
 GLfloat  incZoom=3;
 
@@ -152,7 +153,7 @@ void display(void){
     gluPerspective(angZoom, (float)wScreen/hScreen, 0.1, 3*zC);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(obsP[0], obsP[1], obsP[2], 0,0,0, 0, 1, 0);
+    gluLookAt(obsP[0], obsP[1], obsP[2], obsPfin[0],obsPfin[1],obsPfin[2], 0, 1, 0);
     //================================================================= N„o modificar
     
     
@@ -162,6 +163,7 @@ void display(void){
     drawEixos();
     drawScene();
     
+    printf("Observer at: (%.2f, %.2f, %.2f) looking to (%.2f, %.2f, %.2f)\n", obsP[0], obsP[1], obsP[2], obsPfin[0], obsPfin[1], obsPfin[2]);
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Actualizacao
     glutSwapBuffers();
@@ -178,15 +180,15 @@ void keyboard(unsigned char key, int x, int y){
             glutPostRedisplay();
             break;
             
-        case 'A':
-        case 'a':
-            //??
+        case 'J':
+        case 'j':
+            obsPfin[1] -= 0.3;
             glutPostRedisplay();
             break;
             
-        case 'S':
-        case 's':
-            //??
+        case 'K':
+        case 'k':
+            obsPfin[1] += 0.3;
             glutPostRedisplay();
             break;
             
@@ -214,28 +216,25 @@ void keyboard(unsigned char key, int x, int y){
     
 }
 
-
-
 void teclasNotAscii(int key, int x, int y){
     
-    if(key == GLUT_KEY_UP)
-        obsP[1] = (obsP[1]+ 0.1) ;
-    if(key == GLUT_KEY_DOWN)
-        obsP[1] = (obsP[1]- 0.1) ;
+    if(key == GLUT_KEY_UP) {
+		obsP[0]=obsP[0]+incVisao*cos(aVisao); 
+		obsP[2]=obsP[2]-incVisao*sin(aVisao); 
+	}
+	if(key == GLUT_KEY_DOWN) {
+		obsP[0]=obsP[0]-incVisao*cos(aVisao); 
+		obsP[2]=obsP[2]+incVisao*sin(aVisao); 
+	} 
+	if(key == GLUT_KEY_LEFT) {
+		aVisao = (aVisao + 0.1) ;
+	}
+	if(key == GLUT_KEY_RIGHT) {
+		aVisao = (aVisao - 0.1) ;
+	}
     
-    if (obsP[1]>yC)
-        obsP[1]=yC;
-    if (obsP[1]<-yC)
-        obsP[1]=-yC;
-    
-    if(key == GLUT_KEY_LEFT)
-        aVisao = (aVisao + 0.1) ;
-    if(key == GLUT_KEY_RIGHT)
-        aVisao = (aVisao - 0.1) ;
-    
-    obsP[0]=rVisao*cos(aVisao);
-    obsP[2]=rVisao*sin(aVisao);
-    
+    obsPfin[0] =obsP[0]+rVisao*cos(aVisao);
+	obsPfin[2] =obsP[2]-rVisao*sin(aVisao);
     
     glutPostRedisplay();
     
