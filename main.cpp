@@ -56,8 +56,8 @@ GLint        wScreen=800, hScreen=500;        //.. janela (pixeis)
 GLfloat        xC=10.0, yC=10.0, zC=10.0;        //.. Mundo  (unidades mundo)
 
 //------------------------------------------------------------ Observador
-GLfloat  rVisao=5, aVisao=0.5*PI, incVisao=0.05;
-GLfloat  obsP[] ={-5, 3.0, -5};
+GLfloat  rVisao=5, aVisao=PI, incVisao=0.05;
+GLfloat  obsP[] ={-1, 3.0, -1};
 GLfloat  obsPfin[] ={obsP[0]-rVisao*cos(aVisao), obsP[1], obsP[2]-rVisao*sin(aVisao)};
 GLfloat  angZoom=90;
 GLfloat  incZoom=3;
@@ -112,6 +112,8 @@ void drawEixos()
 
 
 void drawStairs() {
+    
+    glPushMatrix();
     for (int i = 0; i < N_STAIRS; i++) {
        
         glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT *2, 0);
@@ -132,12 +134,46 @@ void drawStairs() {
         glPopMatrix();
 
     }
+    glPopMatrix();
+}
+
+void drawSpring(float inner, float outer, int n_circles) {
+
+
+    glPushMatrix();
+        glTranslatef(2, 2, 0);
+        glRotated(90, 1, 0, 0);
+
+        for (int i = 0; i < n_circles; i++) {
+            
+            switch (i%4)
+            {
+                case 0:
+                    glColor4f(RED);
+                    break;
+                case 1:
+                    glColor4f(GREEN);
+                    break;
+                case 2:
+                    glColor4f(BLUE);
+                    break;
+                case 3:
+                    glColor4f(YELLOW);
+                    break;
+            }
+
+            glutSolidTorus(inner, outer, 20, 20);
+            glTranslatef(0, 0, -0.05);
+            
+        }
+        
+    glPopMatrix();
 }
 
 void drawScene(){
     
     drawStairs();
-   
+    drawSpring(0.05, 0.5, 20);
 }
 
 void display(void){
