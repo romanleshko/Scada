@@ -26,8 +26,6 @@ static GLfloat vertices[]={
    -1,  0, -1,   
    -1,  0,  1,    
    
-  
-     
 };
 
 static GLfloat normais[] = {
@@ -75,7 +73,7 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 GLint   dia=0;
 GLfloat intensidade=0.0;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
-GLint   ligaFoco=0;
+GLint   ligaFoco=1;
 GLfloat rFoco=1.1, aFoco=aVisao;
 GLfloat incH =0.0, incV=0.0;
 GLfloat incMaxH =0.5, incMaxV=0.35;   
@@ -185,10 +183,6 @@ void inicializa(void)
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glMaterialfv(GL_FRONT,GL_SPECULAR, white);
 	glMaterialfv(GL_FRONT,GL_EMISSION, black);
-	                    
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
-	// glDisable(GL_LIGHT0);
 
 	//glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);    // dos dois lados
 	  
@@ -285,7 +279,6 @@ void drawStairs() {
 
 void drawSpring(float inner, float outer, int n_circles) {
 
-
     glPushMatrix();
         glTranslatef(2, 2, 0);
         glRotated(90, 1, 0, 0);
@@ -317,8 +310,11 @@ void drawSpring(float inner, float outer, int n_circles) {
 }
 
 void drawScene(){
+
+	initLights();
+
     drawChao();
- drawSkySphere();
+	drawSkySphere();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
 }
@@ -338,7 +334,6 @@ void display(void){
     glLoadIdentity();
     gluLookAt(obsPini[0], obsPini[1], obsPini[2], obsPfin[0],obsPfin[1],obsPfin[2], 0, 1, 0);
     //================================================================= N„o modificar
-    
 
 
     drawEixos();
