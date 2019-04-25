@@ -1,5 +1,8 @@
-
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 
 GLfloat  esmeraldAmb []={ 0.0215 ,0.1745 ,0.0215 };
