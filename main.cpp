@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "materiais.h"
+#include "RgbImage.h"
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -17,10 +20,14 @@
 
 
 static GLfloat vertices[]={
-    -1,  0,  1,    
-    -1,  0, -1,    
+
+    1,  0,  1, 
     1,  0, -1,    
-    1,  0,  1,    
+   -1,  0, -1,   
+   -1,  0,  1,    
+   
+  
+     
 };
 
 static GLfloat normais[] = {
@@ -39,7 +46,7 @@ static GLfloat cor[]={
     1.0,  0.0, 1.0,   
 };
 
-//=========================================================== FACES DA MESA
+
 GLboolean   frenteVisivel=1;
 
 static GLuint   square[] = {0, 1, 2, 3};
@@ -48,42 +55,304 @@ static GLuint   STAIR_LENGTH = 1.7;
 static GLuint   STAIR_HEIGHT = 1;
 static GLuint   N_STAIRS = 10;
 
-
+//skybox
+GLUquadricObj*  sky  = gluNewQuadric ( );
+GLfloat         sizeSky  = 30;
 
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
-GLint        wScreen=800, hScreen=500;        //.. janela (pixeis)
+GLint        wScreen=1400, hScreen=1000;           //.. janela (pixeis)
 GLfloat        xC=10.0, yC=10.0, zC=10.0;        //.. Mundo  (unidades mundo)
 
 //------------------------------------------------------------ Observador
-GLfloat  rVisao=5, aVisao=PI, incVisao=0.05;
-GLfloat  obsP[] ={-1, 3.0, -1};
-GLfloat  obsPfin[] ={obsP[0]-rVisao*cos(aVisao), obsP[1], obsP[2]-rVisao*sin(aVisao)};
-GLfloat  angZoom=90;
-GLfloat  incZoom=3;
+GLfloat  rVisao=3.0, aVisao=0.5*PI, incVisao=0.1;
+GLfloat  angPersp=109.0;
+GLfloat  obsPini[] ={-5, 5, 0};
+GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisao*sin(aVisao)};
 
 
+// LUZ
+GLint   dia=0;
+GLfloat intensidade=0.0;
+GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
+GLint   ligaFoco=1;
+GLfloat rFoco=1.1, aFoco=aVisao;
+GLfloat incH =0.0, incV=0.0;
+GLfloat incMaxH =0.5, incMaxV=0.35;   
+GLfloat focoPini[]= { obsPini[0], obsPini[1], obsPini[2], 1.0 };
+GLfloat focoPfin[]= { obsPini[0]-rFoco*cos(aFoco), obsPini[1], obsPini[2]-rFoco*sin(aFoco), 1.0};
+GLfloat focoDir[] = { focoPfin[0]-focoPini[0], 0, focoPfin[2]-focoPini[2]};
+GLfloat focoExp   = 10.0;
+GLfloat focoCut   = 60.0;
+
+GLfloat focoCorDif[4] ={ 0.9, 0.9, 0.9, 1.0}; 
+GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
+
+
+
+// TEXTURAS
+GLuint   texture[10];
+RgbImage imag;
+
+void initMaterials(int material) {
+	
+	switch (material){
+	case 0: //�����������������������������������esmerald
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  esmeraldAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  esmeraldDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, esmeraldSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,esmeraldCoef);
+		break;
+	case 1: //�����������������������������������jade
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  jadeAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  jadeDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, jadeSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,jadeCoef);
+		break;
+	case 2: //�����������������������������������obsidian
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  obsidianAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  obsidianDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, obsidianSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,obsidianCoef);
+		break;
+	case 3: //�����������������������������������pearl
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  pearlAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  pearlDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, pearlSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,pearlCoef);
+		break;
+	case 4: //�����������������������������������ruby
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  rubyAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  rubyDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, rubySpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,rubyCoef);
+		break;
+	case 5: //�����������������������������������turquoise
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  turquoiseAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  turquoiseDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, turquoiseSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,turquoiseCoef);
+		break;
+	case 6: //�����������������������������������brass
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  brassAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  brassDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, brassSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,brassCoef);
+		break;
+	case 7: //�����������������������������������bronze
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  bronzeAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  bronzeDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, bronzeSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,bronzeCoef);
+		break;
+	case 8: //�����������������������������������chrome
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  chromeAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  chromeDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, chromeSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,chromeCoef);
+		break;
+	case 9: //�����������������������������������copper
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  copperAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  copperDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, copperSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,copperCoef);
+		break;
+	case 10: //�����������������������������������gold
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  goldAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  goldDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, goldSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,goldCoef);
+		break;
+	case 11: //�����������������������������������silver
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  silverAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  silverDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, silverSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,silverCoef);
+		break;
+	case 12: //�����������������������������������blackPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  blackPlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  blackPlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, blackPlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,blackPlasticCoef);
+		break;
+	case 13: //�����������������������������������cyankPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  cyanPlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  cyanPlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, cyanPlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,cyanPlasticCoef);
+		break;
+	case 14: //�����������������������������������greenPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  greenPlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  greenPlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, greenPlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,greenPlasticCoef);
+		break;
+	case 15: //�����������������������������������redPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  redPlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  redPlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, redPlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,redPlasticCoef);
+		break;
+	case 16: //�����������������������������������yellowPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  whitePlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  whitePlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, whitePlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,whitePlasticCoef);
+		break;
+	case 17: //�����������������������������������yellowPlastic
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  yellowPlasticAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  yellowPlasticDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, yellowPlasticSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,yellowPlasticCoef);
+		break;
+	case 18: //�����������������������������������blackRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  blackRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  blackRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, blackRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,blackRubberCoef);
+		break;
+	case 19: //�����������������������������������cyanRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  cyanRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  cyanRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, cyanRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,cyanRubberCoef);
+		break;
+	case 20: //�����������������������������������greenRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  greenRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  greenRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, greenRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,greenRubberCoef);
+		break;
+	case 21: //�����������������������������������redRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  redRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  redRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, redRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,redRubberCoef);
+		break;
+	case 22: //�����������������������������������redRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  whiteRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  whiteRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, whiteRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,whiteRubberCoef);
+		break;
+	case 23: //�����������������������������������redRubber
+		glMaterialfv(GL_FRONT,GL_AMBIENT,  yellowRubberAmb  );
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,  yellowRubberDif );
+		glMaterialfv(GL_FRONT,GL_SPECULAR, yellowRubberSpec);
+		glMaterialf (GL_FRONT,GL_SHININESS,yellowRubberCoef);
+		break;
+	}		
+}
+
+
+//========================================================= ILUMINACAO                 
+void initLights(void){
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
+	glLightfv(GL_LIGHT1, GL_POSITION,      focoPini );
+	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION,focoDir );
+	glLightf (GL_LIGHT1, GL_SPOT_EXPONENT ,focoExp);
+    glLightf (GL_LIGHT1, GL_SPOT_CUTOFF,   focoCut);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE,       focoCorDif );   
+	glLightfv(GL_LIGHT1, GL_SPECULAR,      focoCorEsp  );
+	
+	if (ligaFoco)
+	   glEnable(GL_LIGHT1);
+	else
+		glDisable(GL_LIGHT1);
+	
+}
+
+void initTexturas(void) {
+    
+    //----------------------------------------- SKY
+	glGenTextures(1, &texture[0]);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	imag.LoadBmpFile("skybox_space.bmp");
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+	imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData());
+
+	glGenTextures(1, &texture[1]);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
+	imag.LoadBmpFile("chao.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+		imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData());  	
+
+}
+
+void drawChao() {
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glBindTexture(GL_TEXTURE_2D,texture[1]);
+	//initMaterials(16);		
+	glPushMatrix();
+		glTranslatef(0,STAIR_HEIGHT,0);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f,0.0f);  	 glVertex3i( -xC,  0, -xC ); 
+			glTexCoord2f(1.0, 0.0); 	 glVertex3i( -xC,   0,  xC ); 
+			glTexCoord2f(1.0, 1.0); glVertex3i(  xC,   0,  xC); 
+			glTexCoord2f(0.0, 1.0);  glVertex3i(  xC,     0,  -xC); 
+		glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
 
 
 
 //================================================================================
 //=========================================================================== INIT
 void inicializa(void)
-{
-    glClearColor(BLACK);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖApagar
-    glEnable(GL_DEPTH_TEST);    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖProfundidade
-    glShadeModel(GL_SMOOTH);    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖInterpolacao de cores
-    /*
-    glEnable(GL_CULL_FACE);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖFaces visiveis
-    glCullFace(GL_BACK);        //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖMostrar so as da frente
-    */
-    glVertexPointer(3, GL_FLOAT, 0, vertices); //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖVertex arrays
+{   
+    //glClearColor(BLACK);     
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL); 
+    //glShadeModel(GL_SMOOTH);  
+    glFrontFace(GL_CW);
+    //glEnable(GL_CULL_FACE);     
+    //glCullFace(GL_BACK);   
+    glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE);
+    
+    glVertexPointer(3, GL_FLOAT, 0, vertices); 
     glEnableClientState(GL_VERTEX_ARRAY);
     glNormalPointer(GL_FLOAT, 0, normais);
     glEnableClientState(GL_NORMAL_ARRAY);
     glColorPointer(3, GL_FLOAT, 0, cor);
     glEnableClientState(GL_COLOR_ARRAY);
+    initLights();
+    initTexturas();
 }
+
+void drawSkySphere(){
+	
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glBindTexture(GL_TEXTURE_2D,texture[0]);
+	// initMaterials(16);		// branco
+	
+	glPushMatrix();		
+		glRotatef (       90, -1, 0, 0);
+		gluQuadricDrawStyle ( sky, GLU_FILL   );
+		gluQuadricNormals   ( sky, GLU_SMOOTH );
+		gluQuadricTexture   ( sky, GL_TRUE    );
+		gluSphere ( sky, sizeSky*1, 150, 150);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);			
+};
 
 
 
@@ -116,22 +385,24 @@ void drawStairs() {
     glPushMatrix();
     for (int i = 0; i < N_STAIRS; i++) {
        
-        glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT *2, 0);
+        
         glPushMatrix();
              glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
 
-            glPushMatrix();
-                
-                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square);   
-            glPopMatrix();
-    
             glPushMatrix();
                 glTranslatef(STAIR_LENGTH, STAIR_HEIGHT , 0);
                 glRotatef(90, 0 , 0, 1);
                 glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square); 
             glPopMatrix();
             
+            glPushMatrix();
+                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square);   
+            glPopMatrix();
+
+    
+            
         glPopMatrix();
+        glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT * 2, 0);
 
     }
     glPopMatrix();
@@ -171,7 +442,8 @@ void drawSpring(float inner, float outer, int n_circles) {
 }
 
 void drawScene(){
-    
+    drawChao();
+ drawSkySphere();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
 }
@@ -186,95 +458,138 @@ void display(void){
     glViewport (0, 0, wScreen, hScreen);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(angZoom, (float)wScreen/hScreen, 0.1, 3*zC);
+    gluPerspective(angPersp, (float)wScreen/hScreen, 0.1, 3*zC);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(obsP[0], obsP[1], obsP[2], obsPfin[0],obsPfin[1],obsPfin[2], 0, 1, 0);
+    gluLookAt(obsPini[0], obsPini[1], obsPini[2], obsPfin[0],obsPfin[1],obsPfin[2], 0, 1, 0);
     //================================================================= N„o modificar
     
-    
-    
-    
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖObjectos
+
+
     drawEixos();
     drawScene();
     
-    printf("Observer at: (%.2f, %.2f, %.2f) looking to (%.2f, %.2f, %.2f)\n", obsP[0], obsP[1], obsP[2], obsPfin[0], obsPfin[1], obsPfin[2]);
+    printf("Observer at: (%.2f, %.2f, %.2f) looking to (%.2f, %.2f, %.2f)\n", obsPini[0], obsPini[1], obsPini[2], obsPfin[0], obsPfin[1], obsPfin[2]);
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Actualizacao
     glutSwapBuffers();
 }
 
-//======================================================= EVENTOS
-void keyboard(unsigned char key, int x, int y){
-    
-    
-    switch (key) {
-        case 'f':
-        case 'F':
-            frenteVisivel=!frenteVisivel;
-            glutPostRedisplay();
-            break;
-            
-        case 'J':
-        case 'j':
-            obsPfin[1] -= 0.3;
-            glutPostRedisplay();
-            break;
-            
-        case 'K':
-        case 'k':
-            obsPfin[1] += 0.3;
-            glutPostRedisplay();
-            break;
-            
-        case 'e':
-        case 'E':
-            //??
-            glutPostRedisplay();
-            break;
-            
-        case 'd':
-        case 'D':
-            //??
-            glutPostRedisplay();
-            break;
-            
-            
-            
-            
-            
-            //--------------------------- Escape
-        case 27:
-            exit(0);
-            break;
-    }
-    
+void updateVisao(){
+	
+	obsPfin[0] =obsPini[0]+rVisao*cos(aVisao);
+	obsPfin[2] =obsPini[2]-rVisao*sin(aVisao);
+	
+	focoPini[0]=obsPini[0];
+	focoPini[2]=obsPini[2];
+	focoPfin[0]=focoPini[0]-rFoco*cos(aFoco+incH);
+	focoPfin[2]=focoPini[2]-rFoco*sin(aFoco+incH);
+	focoPini[1]=obsPini[1];
+	focoPini[2]=obsPini[2];
+	focoDir[0] =focoPfin[0]-focoPini[0];
+	focoDir[1] =incV;
+	focoDir[2] =focoPfin[2]-focoPini[2];
+	
+	glutPostRedisplay();		
 }
 
-void teclasNotAscii(int key, int x, int y){
+
+void keyboard(unsigned char key, int x, int y){
+	switch (key) {
+
+
+	//--------------------------- Direccao da Lanterna
+	//--------------------------- Projeccao	
+	case 's':
+	case 'S':
+		incH=incH-0.05;
+		if (incH<-incMaxH ) incH=-incMaxH ; 
+		updateVisao();
+	break;
+	case 'd':
+	case 'D':
+		incH=incH+0.05;
+		if (incH>incMaxH ) incH=incMaxH ; 
+		updateVisao();
+	break;
+	case 'e':
+	case 'E':
+		incV=incV+0.05;
+		if (incV>incMaxV ) incV=incMaxV ; 
+		updateVisao();
+	break;
+	case 'c':
+	case 'C':
+		incV=incV-0.05;
+		if (incV<-incMaxV ) incV=-incMaxV ; 
+		updateVisao();
+	break;
+	
+	//--------------------------- Observador
+	case 'f':
+	case 'F':
+		ligaFoco=!ligaFoco;
+		glutPostRedisplay();	
+	break;
+
+	
+	//=============================================
+	//--------------------------- Angulo
+	case 'z': case 'Z':
+		angPersp=angPersp+3;
+		if (angPersp>170) angPersp=170;
+		glutPostRedisplay();	
+	break;
+	case 'x': case 'X':
+		angPersp=angPersp-3;
+		if (angPersp<1) angPersp=1;
+		glutPostRedisplay();	
+	break;
+
+	//--------------------------- Altura observador
+	case 'q': case 'Q':
+		obsPini[1]=obsPini[1]+1;
+		glutPostRedisplay();	
+	break;
+	case 'a': case 'A':
+		obsPini[1]=obsPini[1]-1;
+		glutPostRedisplay();	
+	break;
+	
+		//--------------------------- Escape
+	case 27:
+		exit(0);
+    break;
+	
+  }
+}
+
+
     
+void teclasNotAscii(int key, int x, int y)
+{
     if(key == GLUT_KEY_UP) {
-		obsP[0]=obsP[0]+incVisao*cos(aVisao); 
-		obsP[2]=obsP[2]-incVisao*sin(aVisao); 
+		obsPini[0]=obsPini[0]+incVisao*cos(aVisao); 
+		obsPini[2]=obsPini[2]-incVisao*sin(aVisao); 
 	}
 	if(key == GLUT_KEY_DOWN) {
-		obsP[0]=obsP[0]-incVisao*cos(aVisao); 
-		obsP[2]=obsP[2]+incVisao*sin(aVisao); 
+		obsPini[0]=obsPini[0]-incVisao*cos(aVisao); 
+		obsPini[2]=obsPini[2]+incVisao*sin(aVisao); 
 	} 
 	if(key == GLUT_KEY_LEFT) {
 		aVisao = (aVisao + 0.1) ;
+		aFoco=aFoco-0.1;		
 	}
 	if(key == GLUT_KEY_RIGHT) {
 		aVisao = (aVisao - 0.1) ;
+		aFoco=aFoco+0.1;
 	}
-    
-    obsPfin[0] =obsP[0]+rVisao*cos(aVisao);
-	obsPfin[2] =obsP[2]-rVisao*sin(aVisao);
-    
-    glutPostRedisplay();
-    
+	updateVisao();
 }
+    
+    
+
+
 
 
 //======================================================= MAIN
@@ -285,7 +600,7 @@ int main(int argc, char** argv){
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
     glutInitWindowSize (wScreen, hScreen);
     glutInitWindowPosition (300, 100);
-    glutCreateWindow ("{jh,pjmm}@dei.uc.pt|       |FaceVisivel:'f'|      |Observador:'SETAS'|        |Andar-'a/s'|        |Rodar -'e/d'| ");
+    glutCreateWindow ("    |FaceVisivel:'f'|      |Observador:'SETAS'|        |Andar-'a/s'|        |Rodar -'e/d'| ");
     
     inicializa();
     
