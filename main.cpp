@@ -31,10 +31,10 @@ static GLfloat vertices[]={
 };
 
 static GLfloat normais[] = {
-    0.0,  1.0,  0.0,
-    0.0,  1.0,  0.0,
-    0.0,  1.0,  0.0,
-    0.0,  1.0,  0.0,
+    0.0,  -1.0,  0.0,
+    0.0,  -1.0,  0.0,
+    0.0,  -1.0,  0.0,
+    0.0,  -1.0,  0.0,
 };
 
 
@@ -75,7 +75,7 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 GLint   dia=0;
 GLfloat intensidade=0.0;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
-GLint   ligaFoco=1;
+GLint   ligaFoco=0;
 GLfloat rFoco=1.1, aFoco=aVisao;
 GLfloat incH =0.0, incV=0.0;
 GLfloat incMaxH =0.5, incMaxV=0.35;   
@@ -94,155 +94,7 @@ GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0};
 GLuint   texture[10];
 RgbImage imag;
 
-void initMaterials(int material) {
-	
-	switch (material){
-	case 0: //�����������������������������������esmerald
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  esmeraldAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  esmeraldDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, esmeraldSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,esmeraldCoef);
-		break;
-	case 1: //�����������������������������������jade
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  jadeAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  jadeDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, jadeSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,jadeCoef);
-		break;
-	case 2: //�����������������������������������obsidian
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  obsidianAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  obsidianDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, obsidianSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,obsidianCoef);
-		break;
-	case 3: //�����������������������������������pearl
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  pearlAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  pearlDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, pearlSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,pearlCoef);
-		break;
-	case 4: //�����������������������������������ruby
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  rubyAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  rubyDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, rubySpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,rubyCoef);
-		break;
-	case 5: //�����������������������������������turquoise
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  turquoiseAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  turquoiseDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, turquoiseSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,turquoiseCoef);
-		break;
-	case 6: //�����������������������������������brass
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  brassAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  brassDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, brassSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,brassCoef);
-		break;
-	case 7: //�����������������������������������bronze
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  bronzeAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  bronzeDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, bronzeSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,bronzeCoef);
-		break;
-	case 8: //�����������������������������������chrome
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  chromeAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  chromeDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, chromeSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,chromeCoef);
-		break;
-	case 9: //�����������������������������������copper
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  copperAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  copperDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, copperSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,copperCoef);
-		break;
-	case 10: //�����������������������������������gold
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  goldAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  goldDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, goldSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,goldCoef);
-		break;
-	case 11: //�����������������������������������silver
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  silverAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  silverDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, silverSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,silverCoef);
-		break;
-	case 12: //�����������������������������������blackPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  blackPlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  blackPlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, blackPlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,blackPlasticCoef);
-		break;
-	case 13: //�����������������������������������cyankPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  cyanPlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  cyanPlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, cyanPlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,cyanPlasticCoef);
-		break;
-	case 14: //�����������������������������������greenPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  greenPlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  greenPlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, greenPlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,greenPlasticCoef);
-		break;
-	case 15: //�����������������������������������redPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  redPlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  redPlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, redPlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,redPlasticCoef);
-		break;
-	case 16: //�����������������������������������yellowPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  whitePlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  whitePlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, whitePlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,whitePlasticCoef);
-		break;
-	case 17: //�����������������������������������yellowPlastic
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  yellowPlasticAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  yellowPlasticDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, yellowPlasticSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,yellowPlasticCoef);
-		break;
-	case 18: //�����������������������������������blackRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  blackRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  blackRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, blackRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,blackRubberCoef);
-		break;
-	case 19: //�����������������������������������cyanRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  cyanRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  cyanRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, cyanRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,cyanRubberCoef);
-		break;
-	case 20: //�����������������������������������greenRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  greenRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  greenRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, greenRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,greenRubberCoef);
-		break;
-	case 21: //�����������������������������������redRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  redRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  redRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, redRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,redRubberCoef);
-		break;
-	case 22: //�����������������������������������redRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  whiteRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  whiteRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, whiteRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,whiteRubberCoef);
-		break;
-	case 23: //�����������������������������������redRubber
-		glMaterialfv(GL_FRONT,GL_AMBIENT,  yellowRubberAmb  );
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,  yellowRubberDif );
-		glMaterialfv(GL_FRONT,GL_SPECULAR, yellowRubberSpec);
-		glMaterialf (GL_FRONT,GL_SHININESS,yellowRubberCoef);
-		break;
-	}		
-}
+
 
 
 //========================================================= ILUMINACAO                 
@@ -298,8 +150,7 @@ void drawChao() {
 
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glBindTexture(GL_TEXTURE_2D,texture[1]);
-	//initMaterials(16);		
+	glBindTexture(GL_TEXTURE_2D,texture[1]);	
 	glPushMatrix();
 		glTranslatef(0,STAIR_HEIGHT,0);
 		glBegin(GL_QUADS);
@@ -318,14 +169,37 @@ void drawChao() {
 //=========================================================================== INIT
 void inicializa(void)
 {   
+
+	glClearColor(1,1,1,1);
+	glShadeModel(GL_SMOOTH);
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);                                    
+
+	//����������������������������������������������� ILUMINACAO
+	GLfloat  black []={ 0.0 ,0.0 ,0.0, 1};
+	GLfloat  white []={ 1 ,1 ,1, 1 };
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+	glMaterialfv(GL_FRONT,GL_SPECULAR, white);
+	glMaterialfv(GL_FRONT,GL_EMISSION, black);
+	                    
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	// glDisable(GL_LIGHT0);
+
+	//glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);    // dos dois lados
+	  
+
     //glClearColor(BLACK);     
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_COLOR_MATERIAL); 
+
     //glShadeModel(GL_SMOOTH);  
-    glFrontFace(GL_CW);
+    //glFrontFace(GL_CW);
     //glEnable(GL_CULL_FACE);     
     //glCullFace(GL_BACK);   
-    glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE);
+   
     
     glVertexPointer(3, GL_FLOAT, 0, vertices); 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -342,7 +216,7 @@ void drawSkySphere(){
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_2D,texture[0]);
-	// initMaterials(16);		// branco
+
 	
 	glPushMatrix();		
 		glRotatef (       90, -1, 0, 0);
@@ -381,7 +255,8 @@ void drawEixos()
 
 
 void drawStairs() {
-    
+
+	
     glPushMatrix();
     for (int i = 0; i < N_STAIRS; i++) {
        
