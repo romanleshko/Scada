@@ -48,13 +48,13 @@ static GLfloat cor[]={
 GLboolean   frenteVisivel=1;
 
 static GLuint   square[] = {0, 1, 2, 3};
-static GLuint   STAIR_WIDTH = 2.5;
-static GLuint   STAIR_LENGTH = 1.7;
+static GLuint   STAIR_WIDTH = 2;
+static GLuint   STAIR_LENGTH = 1;
 static GLuint   STAIR_HEIGHT = 1;
 static GLuint   N_STAIRS = 10;
 
 //skybox
-GLUquadricObj*  sky  = gluNewQuadric ( );
+GLUquadricObj*  sky  = gluNewQuadric();
 GLfloat         sizeSky  = 30;
 
 
@@ -71,10 +71,12 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 
 // LUZ
 
-GLfloat intensidade=0.2;
+GLfloat intensidade=0.0;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
 
 GLint   ligaFoco=1;
+GLint	luzAmbiente=1;
+
 GLfloat rFoco=1.1, aFoco=aVisao;
 GLfloat incH =0.0, incV=0.0;
 GLfloat incMaxH =0.5, incMaxV=0.35;   
@@ -99,6 +101,7 @@ RgbImage imag;
 //========================================================= ILUMINACAO                 
 void initLights(void){
 
+	// FOCO
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
 	glLightfv(GL_LIGHT1, GL_POSITION,      focoPini );
 	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION,focoDir );
@@ -106,11 +109,24 @@ void initLights(void){
     glLightf (GL_LIGHT1, GL_SPOT_CUTOFF,   focoCut);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE,       focoCorDif );   
 	glLightfv(GL_LIGHT1, GL_SPECULAR,      focoCorEsp  );
+
+	// Pontual
+	GLfloat cor_ilum[4] = {WHITE};
+	GLfloat pos_ilum[3] = {0, 20, 0};
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, cor_ilum);
+	glLightfv(GL_LIGHT0, GL_POSITION, pos_ilum);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, cor_ilum);
+
 	
 	if (ligaFoco)
-	   glEnable(GL_LIGHT1);
+		glEnable(GL_LIGHT1);
 	else
 		glDisable(GL_LIGHT1);
+
+	if (luzAmbiente)
+		glEnable(GL_LIGHT0);
+	else
+		glDisable(GL_LIGHT0);
 	
 }
 
@@ -119,7 +135,7 @@ void initTexturas(void) {
     //----------------------------------------- SKY
 	glGenTextures(1, &texture[0]);
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -143,11 +159,23 @@ void initTexturas(void) {
 		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
 		imag.ImageData());  	
 
+	glGenTextures(1, &texture[2]);
+	glBindTexture(GL_TEXTURE_2D, texture[2]);
+	imag.LoadBmpFile("scada.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+		imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData()); 
+
 }
 void drawChao(){
 	glNormal3s(0,1,0);
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
 	
 	glPushMatrix();
@@ -166,7 +194,7 @@ void drawChao(){
 void inicializa(void)
 {   
 
-	glClearColor(1,1,1,1);
+	glClearColor(0,0,0,0);
 	glShadeModel(GL_SMOOTH);
 	
 	glEnable(GL_DEPTH_TEST);
@@ -252,7 +280,8 @@ void drawEixos()
 
 void drawStairs() {
 
-	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture[2]);
     glPushMatrix();
     for (int i = 0; i < N_STAIRS; i++) {
        
@@ -276,6 +305,8 @@ void drawStairs() {
 			
     }
     glPopMatrix();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 void drawSpring(float inner, float outer, int n_circles) {
@@ -330,7 +361,7 @@ void display(void){
     glViewport (0, 0, wScreen, hScreen);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(angPersp, (float)wScreen/hScreen, 0.1, 3*zC);
+    gluPerspective(angPersp, (float)wScreen/hScreen, 0.1, 30*zC);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(obsPini[0], obsPini[1], obsPini[2], obsPfin[0],obsPfin[1],obsPfin[2], 0, 1, 0);
@@ -402,6 +433,12 @@ void keyboard(unsigned char key, int x, int y){
 		ligaFoco=!ligaFoco;
 		glutPostRedisplay();	
 	break;
+
+	case 't':
+	case 'T':
+		luzAmbiente = !luzAmbiente;
+		glutPostRedisplay();
+		break;
 
 	
 	//=============================================
