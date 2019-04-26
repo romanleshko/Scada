@@ -13,7 +13,7 @@ GLint    esmeraldCoef = 0.6 *128;
 GLfloat  jadeAmb []={ 0.135 ,0.2225 ,0.1575 };
 GLfloat  jadeDif []={   0.54 ,0.89 ,0.63 };
 GLfloat  jadeSpec []={ 0.316228 ,0.316228 ,0.316228 };
-GLint   jadeCoef = 0.1 *128;
+GLint    jadeCoef = 0.1 *128;
 
 GLfloat  obsidianAmb []={ 0.05375 ,0.05 ,0.06625 };
 GLfloat  obsidianDif []={   0.18275 ,0.17 ,0.22525 };
