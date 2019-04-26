@@ -29,10 +29,10 @@ static GLfloat vertices[]={
 };
 
 static GLfloat normais[] = {
-    0.0,  -1.0,  0.0,
-    0.0,  -1.0,  0.0,
-    0.0,  -1.0,  0.0,
-    0.0,  -1.0,  0.0,
+    0.0,  1.0,  0.0,
+    0.0,  1.0,  0.0,
+    0.0,  1.0,  0.0,
+    0.0,  1.0,  0.0,
 };
 
 
@@ -71,7 +71,7 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 
 // LUZ
 GLint   dia=0;
-GLfloat intensidade=0.0;
+GLfloat intensidade=0.2;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
 GLint   ligaFoco=1;
 GLfloat rFoco=1.1, aFoco=aVisao;
@@ -83,7 +83,7 @@ GLfloat focoDir[] = { focoPfin[0]-focoPini[0], 0, focoPfin[2]-focoPini[2]};
 GLfloat focoExp   = 10.0;
 GLfloat focoCut   = 60.0;
 
-GLfloat focoCorDif[4] ={ 0.9, 0.9, 0.9, 1.0}; 
+GLfloat focoCorDif[4] ={ 1, 1, 1, 1.0}; 
 GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
 
 
@@ -143,14 +143,13 @@ void initTexturas(void) {
 		imag.ImageData());  	
 
 }
-
-void drawChao() {
-
+void drawChao(){
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glBindTexture(GL_TEXTURE_2D,texture[1]);	
+	glBindTexture(GL_TEXTURE_2D,texture[1]);
+		
 	glPushMatrix();
-		glTranslatef(0,STAIR_HEIGHT,0);
+		glTranslatef(0,-5,0);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0.0f,0.0f);  	 glVertex3i( -xC,  0, -xC ); 
 			glTexCoord2f(1.0, 0.0); 	 glVertex3i( -xC,   0,  xC ); 
@@ -160,7 +159,6 @@ void drawChao() {
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 }
-
 
 
 //================================================================================
@@ -179,7 +177,10 @@ void inicializa(void)
 	GLfloat  white []={ 1 ,1 ,1, 1 };
 
 	glEnable(GL_LIGHTING);
+	// glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
+
+
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glMaterialfv(GL_FRONT,GL_SPECULAR, white);
 	glMaterialfv(GL_FRONT,GL_EMISSION, black);
@@ -195,14 +196,16 @@ void inicializa(void)
     //glCullFace(GL_BACK);   
    
     
-    glVertexPointer(3, GL_FLOAT, 0, vertices); 
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
     glEnableClientState(GL_VERTEX_ARRAY);
     glNormalPointer(GL_FLOAT, 0, normais);
     glEnableClientState(GL_NORMAL_ARRAY);
     glColorPointer(3, GL_FLOAT, 0, cor);
     glEnableClientState(GL_COLOR_ARRAY);
+	
+	initTexturas();
     initLights();
-    initTexturas();
+
 }
 
 void drawSkySphere(){
