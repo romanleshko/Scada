@@ -144,10 +144,11 @@ void initTexturas(void) {
 
 }
 void drawChao(){
+	glNormal3s(0,1,0);
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
-		
+	
 	glPushMatrix();
 		glTranslatef(0,-5,0);
 		glBegin(GL_QUADS);
@@ -161,8 +162,6 @@ void drawChao(){
 }
 
 
-//================================================================================
-//=========================================================================== INIT
 void inicializa(void)
 {   
 
@@ -172,20 +171,16 @@ void inicializa(void)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);                                    
 
-	//����������������������������������������������� ILUMINACAO
+
 	GLfloat  black []={ 0.0 ,0.0 ,0.0, 1};
 	GLfloat  white []={ 1 ,1 ,1, 1 };
 
 	glEnable(GL_LIGHTING);
-	// glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
 
 
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-	glMaterialfv(GL_FRONT,GL_SPECULAR, white);
-	glMaterialfv(GL_FRONT,GL_EMISSION, black);
 
-	//glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);    // dos dois lados
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	  
 
     //glClearColor(BLACK);     
@@ -211,9 +206,12 @@ void inicializa(void)
 void drawSkySphere(){
 	
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D,texture[0]);
-
+	glMaterialfv(GL_FRONT,GL_AMBIENT,  whitePlasticAmb  );
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,  whitePlasticDif );
+	glMaterialfv(GL_FRONT,GL_SPECULAR, whitePlasticSpec);
+	glMaterialf (GL_FRONT,GL_SHININESS,whitePlasticCoef);
 	
 	glPushMatrix();		
 		glRotatef (       90, -1, 0, 0);
