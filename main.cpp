@@ -38,10 +38,10 @@ static GLfloat normais[] = {
 
 static GLfloat cor[]={
  
-    0.0,  0.0, 1.0,   
-    0.0,  0.0, 1.0,    
-    1.0,  0.0, 1.0,    
-    1.0,  0.0, 1.0,   
+    0.5,  0.5, 0.5,   
+    0.5,  0.5, 0.5,    
+    0.5,  0.5, 0.5,    
+    0.5,  0.5, 0.5,   
 };
 
 
@@ -60,7 +60,7 @@ GLfloat         sizeSky  = 30;
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
 GLint        wScreen=1400, hScreen=1000;           //.. janela (pixeis)
-GLfloat        xC=10.0, yC=10.0, zC=10.0;        //.. Mundo  (unidades mundo)
+GLfloat        xC=40.0, yC=100.0, zC=100.0;        //.. Mundo  (unidades mundo)
 
 //------------------------------------------------------------ Observador
 GLfloat  rVisao=3.0, aVisao=0.5*PI, incVisao=0.1;
@@ -132,7 +132,7 @@ void initTexturas(void) {
 
 	glGenTextures(1, &texture[1]);
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	imag.LoadBmpFile("chao.bmp");
+	imag.LoadBmpFile("marmore_preto.bmp");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -147,16 +147,16 @@ void initTexturas(void) {
 void drawChao(){
 	glNormal3s(0,1,0);
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
 	
 	glPushMatrix();
 		glTranslatef(0,-5,0);
 		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f,0.0f);  	 glVertex3i( -xC,  0, -xC ); 
-			glTexCoord2f(1.0, 0.0); 	 glVertex3i( -xC,   0,  xC ); 
-			glTexCoord2f(1.0, 1.0); glVertex3i(  xC,   0,  xC); 
-			glTexCoord2f(0.0, 1.0);  glVertex3i(  xC,     0,  -xC); 
+			glTexCoord2f(0.0f,0.0f);  	 glVertex3i( -xC,  0,   -xC ); 
+			glTexCoord2f(10.0, 0.0); 	 glVertex3i( -xC,   0,   xC ); 
+			glTexCoord2f(10.0, 10.0);      glVertex3i(  xC,   0,   xC); 
+			glTexCoord2f(0.0, 10.0);      glVertex3i(  xC,     0, -xC); 
 		glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -256,14 +256,13 @@ void drawStairs() {
     glPushMatrix();
     for (int i = 0; i < N_STAIRS; i++) {
        
-        
         glPushMatrix();
              glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
 
             glPushMatrix();
                 glTranslatef(STAIR_LENGTH, STAIR_HEIGHT , 0);
                 glRotatef(90, 0 , 0, 1);
-                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square); 
+                glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, square);
             glPopMatrix();
             
             glPushMatrix();
@@ -274,7 +273,7 @@ void drawStairs() {
             
         glPopMatrix();
         glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT * 2, 0);
-
+			
     }
     glPopMatrix();
 }
