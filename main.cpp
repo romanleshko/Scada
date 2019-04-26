@@ -70,9 +70,10 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 
 
 // LUZ
-GLint   dia=0;
+
 GLfloat intensidade=0.2;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
+
 GLint   ligaFoco=1;
 GLfloat rFoco=1.1, aFoco=aVisao;
 GLfloat incH =0.0, incV=0.0;
@@ -315,9 +316,9 @@ void drawScene(){
 	initLights();
 
     drawChao();
-	drawSkySphere();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
+	drawSkySphere();
 }
 
 void display(void){
