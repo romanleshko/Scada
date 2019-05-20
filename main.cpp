@@ -14,6 +14,7 @@
 #define RED         1.0, 0.0, 0.0, 1.0
 #define YELLOW     1.0, 1.0, 0.0, 1.0
 #define GREEN    0.0, 1.0, 0.0, 1.0
+#define GRAY     0.5, 0.5, 0.5, 1.0
 #define WHITE    1.0, 1.0, 1.0, 1.0
 #define BLACK    0.0, 0.0, 0.0, 1.0
 #define PI         3.14159
@@ -95,6 +96,10 @@ GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0};
 GLuint   texture[10];
 RgbImage imag;
 
+// SUN & MOON
+GLfloat celestial_rad = 12.5;
+GLfloat sun_ang = PI/2;
+GLfloat moon_ang = PI;
 
 
 
@@ -163,6 +168,32 @@ void initTexturas(void) {
 	glBindTexture(GL_TEXTURE_2D, texture[2]);
 	imag.LoadBmpFile("scada.bmp");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+		imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData()); 
+
+	glGenTextures(1, &texture[3]);
+	glBindTexture(GL_TEXTURE_2D, texture[3]);
+	imag.LoadBmpFile("moon.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+		imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData()); 
+
+	glGenTextures(1, &texture[4]);
+	glBindTexture(GL_TEXTURE_2D, texture[4]);
+	imag.LoadBmpFile("sun.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -342,13 +373,43 @@ void drawSpring(float inner, float outer, int n_circles) {
     glPopMatrix();
 }
 
+void drawSun(float size) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[4]);
+
+	glPushMatrix();
+
+		glTranslatef(celestial_rad*cos(sun_ang), 7.5, celestial_rad*sin(sun_ang));
+		gluSphere(sky, size, 100, 100);
+		sun_ang = sun_ang + 1;
+
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawMoon(float size) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[3]);
+	glColor4f(GRAY);
+	glPushMatrix();
+
+		glTranslatef(0, 7.5, -12.5);
+		gluSphere(sky, size, 100, 100);
+
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
 void drawScene(){
 
 	initLights();
 
+	gluDisk(sky, 0, 5, 100, 100);
     drawChao();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
+	drawSun(1);
+	drawMoon(1);
 	drawSkySphere();
 }
 
