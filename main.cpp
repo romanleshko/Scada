@@ -98,8 +98,9 @@ RgbImage imag;
 
 // SUN & MOON
 GLfloat celestial_rad = 12.5;
-GLfloat sun_ang = PI/2;
-GLfloat moon_ang = PI;
+GLfloat sun_ang = 90;
+GLfloat moon_ang = 270;
+GLfloat celestial_inc = 0.25;
 
 
 
@@ -145,7 +146,7 @@ void initTexturas(void) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	imag.LoadBmpFile("skybox_space.bmp");
+	imag.LoadBmpFile("stars.bmp");
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
 	imag.GetNumCols(),
 		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
@@ -377,11 +378,14 @@ void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
 
+	GLfloat angleRad = (sun_ang*PI)/180;
+
 	glPushMatrix();
 
-		glTranslatef(celestial_rad*cos(sun_ang), 7.5, celestial_rad*sin(sun_ang));
+		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
 		gluSphere(sky, size, 100, 100);
-		sun_ang = sun_ang + 1;
+		sun_ang += celestial_inc;
+		glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -391,10 +395,15 @@ void drawMoon(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[3]);
 	glColor4f(GRAY);
+
+	GLfloat angleRad = (moon_ang*PI)/180;
+
 	glPushMatrix();
 
-		glTranslatef(0, 7.5, -12.5);
+		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
 		gluSphere(sky, size, 100, 100);
+		moon_ang += celestial_inc;
+		glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -403,8 +412,7 @@ void drawMoon(float size) {
 void drawScene(){
 
 	initLights();
-
-	gluDisk(sky, 0, 5, 100, 100);
+	
     drawChao();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
@@ -433,7 +441,7 @@ void display(void){
     drawEixos();
     drawScene();
     
-    printf("Observer at: (%.2f, %.2f, %.2f) looking to (%.2f, %.2f, %.2f)\n", obsPini[0], obsPini[1], obsPini[2], obsPfin[0], obsPfin[1], obsPfin[2]);
+    //printf("Observer at: (%.2f, %.2f, %.2f) looking at (%.2f, %.2f, %.2f)\n", obsPini[0], obsPini[1], obsPini[2], obsPfin[0], obsPfin[1], obsPfin[2]);
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Actualizacao
     glutSwapBuffers();

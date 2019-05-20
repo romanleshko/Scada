@@ -1,5 +1,7 @@
 gl
 .vscode
+*.jpg
+*.png
 
 # Prerequisites
 *.d
