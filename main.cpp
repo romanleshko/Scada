@@ -99,7 +99,8 @@ GLuint   texture[10];
 RgbImage imag;
 
 // SUN & MOON
-GLfloat celestial_rad = 12.5;
+GLfloat celestial_size = 0.5;
+GLfloat celestial_rad = 7.5;
 GLfloat sun_ang = 90;
 GLfloat moon_ang = 270;
 GLfloat celestial_inc = 0.25;
@@ -149,7 +150,7 @@ void initTexturas(void) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	imag.LoadBmpFile("stars.bmp");
+	imag.LoadBmpFile("hubble.bmp");
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
 	imag.GetNumCols(),
 		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
@@ -419,8 +420,8 @@ void drawScene(){
     drawChao();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
-	drawSun(1);
-	drawMoon(1);
+	drawSun(celestial_size);
+	drawMoon(celestial_size);
 	drawSkySphere();
 }
 
