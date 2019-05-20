@@ -58,7 +58,7 @@ static GLuint   N_STAIRS = 10;
 GLUquadricObj*  sky  = gluNewQuadric();
 GLUquadricObj*  earth_disk  = gluNewQuadric();
 
-GLfloat         sizeSky  = 30;
+GLfloat         sizeSky  = 15;
 
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
@@ -156,8 +156,8 @@ void initTexturas(void) {
 
 	glGenTextures(1, &texture[1]);
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	imag.LoadBmpFile("flat_earth.bmp");
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_TEXTURE);
+	imag.LoadBmpFile("flat.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -212,12 +212,14 @@ void drawChao(){
 
 	glEnable(GL_TEXTURE_2D);
 	gluQuadricTexture(earth_disk, GL_TRUE);
+	gluQuadricDrawStyle(earth_disk, GLU_FILL);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
 
 	glPushMatrix();
-		glTranslatef(0, -1, 0);
+		glTranslatef(-4, -1, 0);
+		
 		glRotatef (90, -1, 0, 0);
-		gluDisk(earth_disk, 0.0, 5.0 ,100, 100);
+		gluDisk(earth_disk, 0.0, 13.5 ,100, 100);
 	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
@@ -280,7 +282,7 @@ void drawSkySphere(){
 		gluQuadricDrawStyle ( sky, GLU_FILL   );
 		gluQuadricNormals   ( sky, GLU_SMOOTH );
 		gluQuadricTexture   ( sky, GL_TRUE    );
-		gluSphere ( sky, sizeSky*1, 150, 150);
+		gluSphere ( sky, sizeSky*1, 80, 80);
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);			
 };
@@ -405,7 +407,6 @@ void drawScene(){
 
 	initLights();
 
-	gluDisk(sky, 0, 5, 100, 100);
     drawChao();
     drawStairs();
     drawSpring(0.05, 0.5, 20);
