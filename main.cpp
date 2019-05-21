@@ -194,8 +194,8 @@ void initTexturas(void) {
 
 }
 void drawChao(){
-	glColor3f(1,1,1);
-
+	glColor4f(1,1,1,0.60f);
+	
 	glEnable(GL_TEXTURE_2D);
 	gluQuadricTexture(earth_disk, GL_TRUE);
 	gluQuadricDrawStyle(earth_disk, GLU_FILL);
@@ -472,19 +472,49 @@ void drawScene(){
 
 	initLights();
 	
-    drawChao();
-
 	drawStairs();
     drawSpring(0.05, 0.5, 20);
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
+
+	// REFLECTIONS
+	glDisable(GL_DEPTH_TEST);
+	glColorMask(0, 0, 0, 0);
+	glEnable(GL_STENCIL_TEST);
+
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glStencilFunc(GL_ALWAYS, 0x1, 0x1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	drawChao();
+
+	// desenhar os objectos limitado a zona do stencil buffer
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(1,1,1,1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilFunc(GL_EQUAL, 1 ,1 );
+	glPushMatrix();
+		glScalef(1,-1,1);
+		//drawStairs();
+		//drawSpring(0.05, 0.5, 20);
+		drawSun(celestial_size);
+		drawMoon(celestial_size);
+		//drawSkySphere();	
+	glPopMatrix();
+
+
+	glDisable(GL_STENCIL_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	drawChao();
+
+	glDisable(GL_BLEND);
 }
 
 void display(void){
     
     //================================================================= APaga ecran/profundidade
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
     
     //================================================================= N„o modificar
@@ -635,7 +665,7 @@ void teclasNotAscii(int key, int x, int y)
 int main(int argc, char** argv){
     
     glutInit(&argc, argv);
-    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
+    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
     glutInitWindowSize (wScreen, hScreen);
     glutInitWindowPosition (300, 100);
     glutCreateWindow ("    |FaceVisivel:'f'|      |Observador:'SETAS'|        |Andar-'a/s'|        |Rodar -'e/d'| ");
