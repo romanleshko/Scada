@@ -25,9 +25,10 @@
 #define PI         3.14159
 
 // Escada
-GLfloat   STAIR_WIDTH = 0.5;
+GLfloat   STAIR_WIDTH = 2;
 GLfloat   STAIR_HEIGHT = 1;
-static GLuint   N_STAIRS = 2;
+GLfloat   STAIR_LENGTH = 1;
+GLuint   N_STAIRS = 3;
 
 //skybox
 GLUquadricObj*  sky  = gluNewQuadric();
@@ -277,11 +278,11 @@ void drawEixos()
     
 }
 
-
+/*
 void drawStairs(int x, int y) {
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D,texture[2]);
+	glBindTexture(GL_TEXTURE_2D, texture[2]);
 
 	glNormal3f(0, -1, 0);
     glPushMatrix();
@@ -289,40 +290,98 @@ void drawStairs(int x, int y) {
 		glTranslatef(x, y, 0);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0, 0);
-			glVertex3d(-STAIR_WIDTH, 2, -STAIR_HEIGHT);
+			glVertex3d(-STAIR_WIDTH, 0, -STAIR_HEIGHT);
 
 			glTexCoord2f(1, 0);
-			glVertex3d(STAIR_WIDTH, 2, -STAIR_HEIGHT);
+			glVertex3d(STAIR_WIDTH, 0, -STAIR_HEIGHT);
 
 
 			glTexCoord2f(1, 1);
-			glVertex3d(STAIR_WIDTH, 2, STAIR_HEIGHT);
+			glVertex3d(STAIR_WIDTH, 0, STAIR_HEIGHT);
 
 			glTexCoord2f(0, 1);
-			glVertex3d(-STAIR_WIDTH, 2, STAIR_HEIGHT);
+			glVertex3d(-STAIR_WIDTH, 0, STAIR_HEIGHT);
 		glEnd();
 
-		//glTranslatef(STAIR_WIDTH, STAIR_HEIGHT, 0);
+		glTranslatef(STAIR_WIDTH, STAIR_HEIGHT-(STAIR_HEIGHT/2), 0);
 		glRotatef(-90, 0, 0, 1);
 
 		glBegin(GL_QUADS);
 			glTexCoord2f(0, 0);
-			glVertex3d(-STAIR_WIDTH, 2, -STAIR_HEIGHT);
+			glVertex3d(-STAIR_WIDTH, 0, -STAIR_HEIGHT);
 
 			glTexCoord2f(1, 0);
-			glVertex3d(STAIR_WIDTH, 2, -STAIR_HEIGHT);
-
+			glVertex3d(STAIR_WIDTH, 0, -STAIR_HEIGHT);
 
 			glTexCoord2f(1, 1);
-			glVertex3d(STAIR_WIDTH, 2, STAIR_HEIGHT);
+			glVertex3d(STAIR_WIDTH, 0, STAIR_HEIGHT);
 
 			glTexCoord2f(0, 1);
-			glVertex3d(-STAIR_WIDTH, 2, STAIR_HEIGHT);
+			glVertex3d(-STAIR_WIDTH, 0, STAIR_HEIGHT);
 		glEnd();
 
 		
 
 	glPopMatrix();
+
+	glDisable(GL_TEXTURE_2D);
+}*/
+
+void drawStairs() {
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture[2]);
+    glPushMatrix();
+	glNormal3f(0, 1, 0);
+    for (int i = 0; i < N_STAIRS; i++) {
+
+       
+        glPushMatrix();
+            glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
+
+            glPushMatrix();
+                glTranslatef(STAIR_LENGTH, STAIR_HEIGHT , 0);
+                glRotatef(90, 0 , 0, 1);
+                glBegin(GL_QUADS);
+					glTexCoord2f(0, 0);
+					glVertex3d(1, 0, 1);
+
+					glTexCoord2f(1, 0);
+					glVertex3d(1, 0, -1);
+
+
+					glTexCoord2f(1, 1);
+					glVertex3d(-1, 0, -1);
+
+					glTexCoord2f(0, 1);
+					glVertex3d(-1, 0, 1);
+				glEnd();
+            glPopMatrix();
+            
+            glPushMatrix();
+                glBegin(GL_QUADS);
+					glTexCoord2f(0, 0);
+					glVertex3d(1, 0, 1);
+
+					glTexCoord2f(1, 0);
+					glVertex3d(1, 0, -1);
+
+
+					glTexCoord2f(1, 1);
+					glVertex3d(-1, 0, -1);
+
+					glTexCoord2f(0, 1);
+					glVertex3d(-1, 0, 1);
+				glEnd();
+            glPopMatrix();
+
+    
+            
+        glPopMatrix();
+        glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT * 2, 0);
+			
+    }
+    glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
 }
@@ -415,9 +474,7 @@ void drawScene(){
 	
     drawChao();
 
-	for (int i = 0; i < N_STAIRS; i++) {
-		drawStairs(i*STAIR_HEIGHT, i*STAIR_HEIGHT);
-	}
+	drawStairs();
     drawSpring(0.05, 0.5, 20);
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
@@ -441,7 +498,7 @@ void display(void){
     //================================================================= N„o modificar
 
 
-    drawEixos();
+    //drawEixos();
     drawScene();
     
     //printf("Observer at: (%.2f, %.2f, %.2f) looking at (%.2f, %.2f, %.2f)\n", obsPini[0], obsPini[1], obsPini[2], obsPfin[0], obsPfin[1], obsPfin[2]);
