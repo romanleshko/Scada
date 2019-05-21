@@ -15,7 +15,12 @@
 #define YELLOW     1.0, 1.0, 0.0, 1.0
 #define GREEN    0.0, 1.0, 0.0, 1.0
 #define GRAY     0.5, 0.5, 0.5, 1.0
-#define WHITE    1.0, 1.0, 1.0, 1.0
+
+#define WHITE 1.0, 1.0, 1.0, 1.0
+
+#define SPECULAR_COLOR 0, 0, 0, 0
+#define DIFFUSE_COLOR 1.0, 1.0, 1.0, 1.0
+
 #define BLACK    0.0, 0.0, 0.0, 1.0
 #define PI         3.14159
 
@@ -62,7 +67,7 @@ GLfloat         sizeSky  = 15;
 
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
-GLint        wScreen=1400, hScreen=1000;           //.. janela (pixeis)
+GLint          wScreen=1400, hScreen=1000;           //.. janela (pixeis)
 GLfloat        xC=40.0, yC=100.0, zC=100.0;        //.. Mundo  (unidades mundo)
 
 //------------------------------------------------------------ Observador
@@ -120,11 +125,20 @@ void initLights(void){
 	glLightfv(GL_LIGHT1, GL_SPECULAR,      focoCorEsp  );
 
 	// Pontual
-	GLfloat cor_ilum[4] = {WHITE};
-	GLfloat pos_ilum[3] = {0, 20, 0};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, cor_ilum);
+	GLfloat angleRad = (sun_ang*PI)/180;
+
+	GLfloat pos_ilum[3] = {celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
+	
+	GLfloat cor_dif[4]  = {WHITE};
+	GLfloat cor_spec[4] = {WHITE};
+	GLfloat cor_amb[4] =  {BLACK};
+	GLfloat cor_emi[4] =  {BLACK};
+
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,  cor_dif);
+	glLightfv(GL_LIGHT0, GL_EMISSION, cor_emi);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, cor_amb);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos_ilum);
-	glLightfv(GL_LIGHT2, GL_SPECULAR, cor_ilum);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, cor_spec);
 
 	
 	if (ligaFoco)
@@ -185,7 +199,7 @@ void initTexturas(void) {
 	glGenTextures(1, &texture[3]);
 	glBindTexture(GL_TEXTURE_2D, texture[3]);
 	imag.LoadBmpFile("moon.bmp");
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -198,7 +212,7 @@ void initTexturas(void) {
 	glGenTextures(1, &texture[4]);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
 	imag.LoadBmpFile("sun.bmp");
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -243,6 +257,7 @@ void inicializa(void)
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_AMBIENT_AND_DIFFUSE);
 
 
 
@@ -382,7 +397,21 @@ void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
 
+	GLfloat cor_spec[4]  = {0.1, 0.1, 0.1, 1};
+	GLfloat cor_emi[4] =  {0.1, 0.1, 0.1, 1};
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, cor_spec);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, cor_emi);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, cor_spec);
+	glColor3f(1,1,1);
+	// glColor3f(1,1,1);
+	//glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	//glColor3f(0,0,0);
+	//glColorMaterial(GL_FRONT, GL_EMISSION);
+	//glColor3f(1,1,1);
 	GLfloat angleRad = (sun_ang*PI)/180;
+
+
 
 	glPushMatrix();
 
