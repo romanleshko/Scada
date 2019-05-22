@@ -25,10 +25,10 @@
 #define PI         3.14159
 
 // Escada
-GLfloat   STAIR_WIDTH = 2;
-GLfloat   STAIR_HEIGHT = 1;
+GLfloat   STAIR_WIDTH = 5;
+GLfloat   STAIR_HEIGHT = 0.3;
 GLfloat   STAIR_LENGTH = 1;
-GLuint   N_STAIRS = 3;
+GLuint   N_STAIRS = 50;
 
 //skybox
 GLUquadricObj*  sky  = gluNewQuadric();
@@ -194,7 +194,7 @@ void initTexturas(void) {
 
 }
 void drawChao(){
-	glColor4f(1,1,1,0.60f);
+	glColor4f(1,1,1,0.2f);
 	
 	glEnable(GL_TEXTURE_2D);
 	gluQuadricTexture(earth_disk, GL_TRUE);
@@ -278,112 +278,25 @@ void drawEixos()
     
 }
 
-/*
-void drawStairs(int x, int y) {
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[2]);
-
-	glNormal3f(0, -1, 0);
-    glPushMatrix();
-
-		glTranslatef(x, y, 0);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0, 0);
-			glVertex3d(-STAIR_WIDTH, 0, -STAIR_HEIGHT);
-
-			glTexCoord2f(1, 0);
-			glVertex3d(STAIR_WIDTH, 0, -STAIR_HEIGHT);
-
-
-			glTexCoord2f(1, 1);
-			glVertex3d(STAIR_WIDTH, 0, STAIR_HEIGHT);
-
-			glTexCoord2f(0, 1);
-			glVertex3d(-STAIR_WIDTH, 0, STAIR_HEIGHT);
-		glEnd();
-
-		glTranslatef(STAIR_WIDTH, STAIR_HEIGHT-(STAIR_HEIGHT/2), 0);
-		glRotatef(-90, 0, 0, 1);
-
-		glBegin(GL_QUADS);
-			glTexCoord2f(0, 0);
-			glVertex3d(-STAIR_WIDTH, 0, -STAIR_HEIGHT);
-
-			glTexCoord2f(1, 0);
-			glVertex3d(STAIR_WIDTH, 0, -STAIR_HEIGHT);
-
-			glTexCoord2f(1, 1);
-			glVertex3d(STAIR_WIDTH, 0, STAIR_HEIGHT);
-
-			glTexCoord2f(0, 1);
-			glVertex3d(-STAIR_WIDTH, 0, STAIR_HEIGHT);
-		glEnd();
-
-		
-
-	glPopMatrix();
-
-	glDisable(GL_TEXTURE_2D);
-}*/
-
 void drawStairs() {
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D,texture[2]);
-    glPushMatrix();
-	glNormal3f(0, 1, 0);
-    for (int i = 0; i < N_STAIRS; i++) {
-
-       
-        glPushMatrix();
-            glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
-
-            glPushMatrix();
-                glTranslatef(STAIR_LENGTH, STAIR_HEIGHT , 0);
-                glRotatef(90, 0 , 0, 1);
-                glBegin(GL_QUADS);
-					glTexCoord2f(0, 0);
-					glVertex3d(1, 0, 1);
-
-					glTexCoord2f(1, 0);
-					glVertex3d(1, 0, -1);
-
-
-					glTexCoord2f(1, 1);
-					glVertex3d(-1, 0, -1);
-
-					glTexCoord2f(0, 1);
-					glVertex3d(-1, 0, 1);
-				glEnd();
-            glPopMatrix();
-            
-            glPushMatrix();
-                glBegin(GL_QUADS);
-					glTexCoord2f(0, 0);
-					glVertex3d(1, 0, 1);
-
-					glTexCoord2f(1, 0);
-					glVertex3d(1, 0, -1);
-
-
-					glTexCoord2f(1, 1);
-					glVertex3d(-1, 0, -1);
-
-					glTexCoord2f(0, 1);
-					glVertex3d(-1, 0, 1);
-				glEnd();
-            glPopMatrix();
-
-    
-            
-        glPopMatrix();
-        glTranslatef(STAIR_LENGTH * 2, STAIR_HEIGHT * 2, 0);
+	glEnable(GL_BLEND);
+	glColor4f(1,1,1,0.4);
+	glPushMatrix();
+	int ang = 10;
+	for (int i = 0; i < N_STAIRS; i++) {
+		
+		glPushMatrix();
+			glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
 			
-    }
-    glPopMatrix();
+			glutSolidCube(1);
+		glPopMatrix();
 
-	glDisable(GL_TEXTURE_2D);
+		glTranslatef(STAIR_LENGTH + 0.1, STAIR_HEIGHT + 0.02, 0);
+		glRotatef(ang ,0, 1, 0);
+		//ang += 1.2;
+	}
+	glPopMatrix();
+	glDisable(GL_BLEND);
 }
 
 void drawSpring(float inner, float outer, int n_circles) {
@@ -473,7 +386,7 @@ void drawScene(){
 	initLights();
 	
 	drawStairs();
-    drawSpring(0.05, 0.5, 20);
+    // drawSpring(0.05, 0.5, 20);
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
@@ -498,7 +411,7 @@ void drawScene(){
 		//drawStairs();
 		//drawSpring(0.05, 0.5, 20);
 		drawSun(celestial_size);
-		drawMoon(celestial_size);
+		drawMoon(celestial_size);		
 		//drawSkySphere();	
 	glPopMatrix();
 
@@ -507,6 +420,7 @@ void drawScene(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	drawChao();
+
 
 	glDisable(GL_BLEND);
 }
