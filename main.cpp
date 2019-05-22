@@ -24,6 +24,23 @@
 #define BLACK    0.0, 0.0, 0.0, 1.0
 #define PI         3.14159
 
+#define frand()			((float)rand()/RAND_MAX)
+#define MAX_PARTICULAS  2500
+
+//---------------------------------------- Particle attributes
+typedef struct {
+	float   size;		// tamanho
+	float	life;		// vida
+	float	fade;		// fade
+	float	r, g, b;    // color
+	GLfloat x, y, z;    // posicao
+	GLfloat vx, vy, vz; // velocidade 
+    GLfloat ax, ay, az; // aceleracao
+} Particle;
+
+Particle  particula[MAX_PARTICULAS];
+GLint    milisec = 1000; 
+
 // Escada
 GLfloat   STAIR_WIDTH = 5;
 GLfloat   STAIR_HEIGHT = 0.3;
@@ -193,6 +210,50 @@ void initTexturas(void) {
 		imag.ImageData()); 
 
 }
+
+void iniParticulas(Particle *particula)
+{
+ GLfloat v, theta, phi;
+ int i;
+ GLfloat px, py, pz;
+ GLfloat ps;
+
+	px = -1;
+	py = -2;
+	pz = -3;
+	ps = 0.25;
+
+
+ for(i=0; i<MAX_PARTICULAS; i++)  {
+
+	//---------------------------------  
+	v     = 1*frand()+0.02;
+    theta = 2.0*frand()*M_PI;   // [0..2pi]
+	phi   = frand()*M_PI;		// [0.. pi]
+    
+    particula[i].size = ps ;		// tamanh de cada particula
+    particula[i].x	  = px + 0.1*frand()*px;    // [-200 200]
+    particula[i].y	  = py + 0.1*frand()*py;	// [-200 200]
+    particula[i].z	  = pz + 0.1*frand()*pz;	// [-200 200]
+        
+	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
+    particula[i].vy = v * cos(phi);
+    particula[i].vz = v * sin(theta) * sin(phi);
+	particula[i].ax = 0.01f;
+    particula[i].ay = -0.01f;
+    particula[i].az = 0.015f;
+
+	particula[i].r = 1.0f;
+	particula[i].g = 1.0f;	
+	particula[i].b = 1.0f;	
+	particula[i].life = 1.0f;		                
+	particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
+	}
+}
+
+
+
+
 void drawChao(){
 	glColor4f(1,1,1,0.2f);
 	
@@ -230,6 +291,7 @@ void inicializa(void)
 	
 	initTexturas();
     initLights();
+	iniParticulas(particula);
 
 }
 
@@ -381,6 +443,33 @@ void drawMoon(float size) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+void showParticulas(Particle *particula, int sistema) {
+ int i;
+ int numero;
+
+ numero=(int) (frand()*10.0);
+ 
+ for (i=0; i<MAX_PARTICULAS; i++)
+	{
+
+	glColor4f(1,1,1, particula[i].life);
+ 	glBegin(GL_QUADS);				        
+		glTexCoord2d(0,0); glVertex3f(particula[i].x -particula[i].size, particula[i].y -particula[i].size, particula[i].z);      
+		glTexCoord2d(1,0); glVertex3f(particula[i].x +particula[i].size, particula[i].y -particula[i].size, particula[i].z);        
+		glTexCoord2d(1,1); glVertex3f(particula[i].x +particula[i].size, particula[i].y +particula[i].size, particula[i].z);            
+		glTexCoord2d(0,1); glVertex3f(particula[i].x -particula[i].size, particula[i].y +particula[i].size, particula[i].z);       
+	glEnd();	
+	particula[i].x += particula[i].vx;
+    particula[i].y += particula[i].vy;
+    particula[i].z += particula[i].vz;
+    particula[i].vx += particula[i].ax;
+    particula[i].vy += particula[i].ay;
+    particula[i].vz += particula[i].az;
+	particula[i].life -= particula[i].fade;	
+	}
+
+}
+
 void drawScene(){
 
 	initLights();
@@ -390,6 +479,7 @@ void drawScene(){
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
+	showParticulas(particula, 1);
 
 	// REFLECTIONS
 	glDisable(GL_DEPTH_TEST);
@@ -569,7 +659,20 @@ void teclasNotAscii(int key, int x, int y)
 	updateVisao();
 }
     
-    
+void idle(void)
+{
+
+ glutPostRedisplay();
+
+}
+
+void Timer(int value) 
+{
+	iniParticulas(particula);
+
+	glutPostRedisplay();
+	glutTimerFunc(milisec ,Timer, 1);   //.. Espera msecDelay milisegundos
+}
 
 
 
@@ -589,6 +692,8 @@ int main(int argc, char** argv){
     glutSpecialFunc(teclasNotAscii);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+	 glutIdleFunc(idle);
+ 	glutTimerFunc(milisec , Timer, 1);     //.. função callback
     
     glutMainLoop();
     
