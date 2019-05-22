@@ -27,6 +27,8 @@
 #define frand()			((float)rand()/RAND_MAX)
 #define MAX_PARTICULAS  2500
 
+GLUquadricObj*  quad  = gluNewQuadric();
+
 //---------------------------------------- Particle attributes
 typedef struct {
 	float   size;		// tamanho
@@ -45,13 +47,11 @@ GLint    milisec = 1000;
 GLfloat   STAIR_WIDTH = 5;
 GLfloat   STAIR_HEIGHT = 0.3;
 GLfloat   STAIR_LENGTH = 1;
-GLuint   N_STAIRS = 50;
+GLuint   N_STAIRS = 35;
 
 //skybox
-GLUquadricObj*  sky  = gluNewQuadric();
-GLUquadricObj*  earth_disk  = gluNewQuadric();
-
 GLfloat         sizeSky  = 15;
+GLfloat skyAngle = 0.0;
 
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
@@ -97,6 +97,13 @@ GLfloat celestial_rad = 7.5;
 GLfloat sun_ang = 90;
 GLfloat moon_ang = 270;
 GLfloat celestial_inc = 0.25;
+
+// PORTAL
+GLfloat angle = 0.0;
+GLfloat portalSize = 6;
+GLfloat portalHeight = 12;
+GLfloat portalSpeed = 1.5;
+
 
 
 
@@ -209,6 +216,19 @@ void initTexturas(void) {
 		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
 		imag.ImageData()); 
 
+	glGenTextures(1, &texture[5]);
+	glBindTexture(GL_TEXTURE_2D, texture[5]);
+	imag.LoadBmpFile("portal.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+		imag.GetNumCols(),
+		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+		imag.ImageData()); 
+
 }
 
 void iniParticulas(Particle *particula)
@@ -251,22 +271,19 @@ void iniParticulas(Particle *particula)
 	}
 }
 
-
-
-
 void drawChao(){
-	glColor4f(1,1,1,0.2f);
+	glColor4f(1, 1, 1, 0.9f);
 	
 	glEnable(GL_TEXTURE_2D);
-	gluQuadricTexture(earth_disk, GL_TRUE);
-	gluQuadricDrawStyle(earth_disk, GLU_FILL);
+	gluQuadricTexture(quad, GL_TRUE);
+	gluQuadricDrawStyle(quad, GLU_FILL);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
 
 	glPushMatrix();
 		glTranslatef(-4, -1, 0);
 		
 		glRotatef (90, -1, 0, 0);
-		gluDisk(earth_disk, 0.0, 13.5 ,100, 100);
+		gluDisk(quad, 0.0, 13.5 ,100, 100);
 	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
@@ -307,38 +324,16 @@ void drawSkySphere(){
 	
 	glPushMatrix();
 		glRotatef (       90, -1, 0, 0);
-		gluQuadricDrawStyle ( sky, GLU_FILL   );
-		gluQuadricNormals   ( sky, GLU_SMOOTH );
-		gluQuadricTexture   ( sky, GL_TRUE    );
-		gluSphere ( sky, sizeSky*1, 80, 80);
+		gluQuadricDrawStyle ( quad, GLU_FILL   );
+		gluQuadricNormals   ( quad, GLU_SMOOTH );
+		gluQuadricTexture   ( quad, GL_TRUE    );
+
+		glRotatef(angle, 0, 0, 1);
+		gluSphere ( quad, sizeSky*1, 80, 80);
+		angle += 0.25;
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);			
 };
-
-
-
-void drawEixos()
-{
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Eixo X
-    glColor4f(RED);
-    glBegin(GL_LINES);
-    glVertex3i( 0, 0, 0);
-    glVertex3i(10, 0, 0);
-    glEnd();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Eixo Y
-    glColor4f(GREEN);
-    glBegin(GL_LINES);
-    glVertex3i(0,  0, 0);
-    glVertex3i(0, 10, 0);
-    glEnd();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Eixo Z
-    glColor4f(BLUE);
-    glBegin(GL_LINES);
-    glVertex3i( 0, 0, 0);
-    glVertex3i( 0, 0,10);
-    glEnd();
-    
-}
 
 void drawStairs() {
 	glEnable(GL_BLEND);
@@ -361,38 +356,6 @@ void drawStairs() {
 	glDisable(GL_BLEND);
 }
 
-void drawSpring(float inner, float outer, int n_circles) {
-
-    glPushMatrix();
-        glTranslatef(0, 2, 0);
-        glRotated(90, 1, 0, 0);
-
-        for (int i = 0; i < n_circles; i++) {
-            
-            switch (i%4)
-            {
-                case 0:
-                    glColor4f(RED);
-                    break;
-                case 1:
-                    glColor4f(GREEN);
-                    break;
-                case 2:
-                    glColor4f(BLUE);
-                    break;
-                case 3:
-                    glColor4f(YELLOW);
-                    break;
-            }
-
-            glutSolidTorus(inner, outer, 20, 20);
-            glTranslatef(0, 0, -0.05);
-            
-        }
-        
-    glPopMatrix();
-}
-
 void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
@@ -405,7 +368,7 @@ void drawSun(float size) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, cor_emi);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, cor_spec);
 	glColor3f(1,1,1);
-	// glColor3f(1,1,1);
+	//glColor3f(1,1,1);
 	//glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	//glColor3f(0,0,0);
 	//glColorMaterial(GL_FRONT, GL_EMISSION);
@@ -417,7 +380,7 @@ void drawSun(float size) {
 	glPushMatrix();
 
 		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
-		gluSphere(sky, size, 100, 100);
+		gluSphere(quad, size, 100, 100);
 		sun_ang += celestial_inc;
 		glutPostRedisplay();
 
@@ -435,8 +398,26 @@ void drawMoon(float size) {
 	glPushMatrix();
 
 		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
-		gluSphere(sky, size, 100, 100);
+		gluSphere(quad, size, 100, 100);
 		moon_ang += celestial_inc;
+		glutPostRedisplay();
+
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawPortal()
+{
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[5]);
+	glColor4f(WHITE);
+
+	glPushMatrix();
+		glTranslatef(0, portalHeight, 0);
+		glRotatef(90, 1, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		gluDisk(quad, 0, portalSize, 100, 100);
+		angle += portalSpeed;
 		glutPostRedisplay();
 
 	glPopMatrix();
@@ -479,6 +460,7 @@ void drawScene(){
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
+	drawPortal();
 	showParticulas(particula, 1);
 
 	// REFLECTIONS
@@ -668,7 +650,7 @@ void idle(void)
 
 void Timer(int value) 
 {
-	iniParticulas(particula);
+	//iniParticulas(particula);
 
 	glutPostRedisplay();
 	glutTimerFunc(milisec ,Timer, 1);   //.. Espera msecDelay milisegundos
@@ -685,7 +667,7 @@ int main(int argc, char** argv){
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
     glutInitWindowSize (wScreen, hScreen);
     glutInitWindowPosition (300, 100);
-    glutCreateWindow ("    |FaceVisivel:'f'|      |Observador:'SETAS'|        |Andar-'a/s'|        |Rodar -'e/d'| ");
+    glutCreateWindow ("FLAT EARTH");
     
     inicializa();
     
