@@ -25,7 +25,7 @@
 #define PI         3.14159
 
 #define frand()			((float)rand()/RAND_MAX)
-#define MAX_PARTICULAS  2500
+#define MAX_PARTICULAS  200
 
 //---------------------------------------- Particle attributes
 typedef struct {
@@ -92,7 +92,7 @@ GLuint   texture[10];
 RgbImage imag;
 
 // SUN & MOON
-GLfloat celestial_size = 0.5;
+GLfloat celestial_size = 1;
 GLfloat celestial_rad = 7.5;
 GLfloat sun_ang = 90;
 GLfloat moon_ang = 270;
@@ -204,49 +204,53 @@ void initTexturas(void) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, 
+	glTexImage2D(GL_TEXTURE_2D, 0, 3,
 		imag.GetNumCols(),
 		imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
 		imag.ImageData()); 
 
 }
 
-void iniParticulas(Particle *particula)
+void initParticulasSun(Particle *particula)
 {
  GLfloat v, theta, phi;
  int i;
  GLfloat px, py, pz;
  GLfloat ps;
 
-	px = -1;
-	py = -2;
-	pz = -3;
-	ps = 0.25;
+ 	GLfloat angleRad = (sun_ang*PI)/180;
+
+	px = celestial_rad*cos(angleRad);
+	py = 7.5;
+	pz = celestial_rad*sin(angleRad);
+	ps = 0.1;
 
 
- for(i=0; i<MAX_PARTICULAS; i++)  {
+ for(i=0; i < MAX_PARTICULAS; i++)  {
 
 	//---------------------------------  
 	v     = 1*frand()+0.02;
     theta = 2.0*frand()*M_PI;   // [0..2pi]
 	phi   = frand()*M_PI;		// [0.. pi]
     
-    particula[i].size = ps ;		// tamanh de cada particula
-    particula[i].x	  = px + 0.1*frand()*px;    // [-200 200]
-    particula[i].y	  = py + 0.1*frand()*py;	// [-200 200]
-    particula[i].z	  = pz + 0.1*frand()*pz;	// [-200 200]
-        
-	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
-    particula[i].vy = v * cos(phi);
-    particula[i].vz = v * sin(theta) * sin(phi);
-	particula[i].ax = 0.01f;
+    particula[i].size = ps;  // tamanh de cada particula
+    particula[i].x	  = px + frand();     // [-200 200]
+    particula[i].y	  = py + frand();	// [-200 200]
+    particula[i].z	  = pz + frand();	// [-200 200]
+    
+	
+	particula[i].vx = - v * px;
+    particula[i].vy = - v * py;
+    particula[i].vz = - v * pz;
+	particula[i].ax = - 0.01f;
     particula[i].ay = -0.01f;
-    particula[i].az = 0.015f;
+    particula[i].az = - 0.015f;
+	
 
 	particula[i].r = 1.0f;
 	particula[i].g = 1.0f;	
 	particula[i].b = 1.0f;	
-	particula[i].life = 1.0f;		                
+	particula[i].life = 20.0f;		                
 	particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
 	}
 }
@@ -291,7 +295,7 @@ void inicializa(void)
 	
 	initTexturas();
     initLights();
-	iniParticulas(particula);
+	initParticulasSun(particula);
 
 }
 
@@ -396,7 +400,7 @@ void drawSpring(float inner, float outer, int n_circles) {
 void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
-
+	initParticulasSun(particula);
 	GLfloat cor_spec[4]  = {0.1, 0.1, 0.1, 1};
 	GLfloat cor_emi[4] =  {0.1, 0.1, 0.1, 1};
 
@@ -443,7 +447,7 @@ void drawMoon(float size) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void showParticulas(Particle *particula, int sistema) {
+void showParticulasSun(Particle *particula, int sistema) {
  int i;
  int numero;
 
@@ -475,11 +479,10 @@ void drawScene(){
 	initLights();
 	
 	drawStairs();
-    // drawSpring(0.05, 0.5, 20);
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
-	showParticulas(particula, 1);
+	showParticulasSun(particula, 1);
 
 	// REFLECTIONS
 	glDisable(GL_DEPTH_TEST);
@@ -666,14 +669,15 @@ void idle(void)
 
 }
 
+/*
 void Timer(int value) 
 {
-	iniParticulas(particula);
+	initParticulasSun(particula);
 
 	glutPostRedisplay();
-	glutTimerFunc(milisec ,Timer, 1);   //.. Espera msecDelay milisegundos
+	glutTimerFunc(milisec ,Timer, 10);   //.. Espera msecDelay milisegundos
 }
-
+*/
 
 
 
@@ -693,7 +697,7 @@ int main(int argc, char** argv){
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 	 glutIdleFunc(idle);
- 	glutTimerFunc(milisec , Timer, 1);     //.. função callback
+ 	//glutTimerFunc(milisec , Timer, 1);     //.. função callback
     
     glutMainLoop();
     
