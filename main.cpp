@@ -52,6 +52,7 @@ GLuint   N_STAIRS = 35;
 //skybox
 GLfloat         sizeSky  = 15;
 GLfloat skyAngle = 0.0;
+GLfloat skySpeed = 0.25;
 
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
@@ -96,13 +97,14 @@ GLfloat celestial_size = 1;
 GLfloat celestial_rad = 7.5;
 GLfloat sun_ang = 90;
 GLfloat moon_ang = 270;
-GLfloat celestial_inc = 0.25;
+GLfloat celestial_inc = -0.25;
+GLfloat celestial_height = 7.5;
 
 // PORTAL
 GLfloat angle = 0.0;
-GLfloat portalSize = 6;
+GLfloat portalSize = 5;
 GLfloat portalHeight = 12;
-GLfloat portalSpeed = 1.5;
+GLfloat portalSpeed = -0.25;
 
 
 
@@ -122,7 +124,7 @@ void initLights(void){
 	// Pontual
 	GLfloat angleRad = (sun_ang*PI)/180;
 
-	GLfloat pos_ilum[3] = {celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
+	GLfloat pos_ilum[3] = {celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad)};
 	
 	GLfloat cor_dif[4]  = {WHITE};
 	GLfloat cor_spec[4] = {BLACK};
@@ -241,7 +243,7 @@ void initParticulasSun(Particle *particula)
  	GLfloat angleRad = (sun_ang*PI)/180;
 
 	px = celestial_rad*cos(angleRad);
-	py = 7.5;
+	py = celestial_height;
 	pz = celestial_rad*sin(angleRad);
 	ps = 0.1;
 
@@ -332,9 +334,9 @@ void drawSkySphere(){
 		gluQuadricNormals   ( quad, GLU_SMOOTH );
 		gluQuadricTexture   ( quad, GL_TRUE    );
 
-		glRotatef(angle, 0, 0, 1);
+		glRotatef(skyAngle, 0, 0, 1);
 		gluSphere ( quad, sizeSky*1, 80, 80);
-		angle += 0.25;
+		skyAngle += skySpeed;
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);			
 };
@@ -383,10 +385,10 @@ void drawSun(float size) {
 
 	glPushMatrix();
 
-		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
+		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
 		sun_ang += celestial_inc;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -401,10 +403,10 @@ void drawMoon(float size) {
 
 	glPushMatrix();
 
-		glTranslatef(celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad));
+		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
 		moon_ang += celestial_inc;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -421,7 +423,7 @@ void drawPortal()
 		glRotatef(angle, 0, 0, 1);
 		gluDisk(quad, 0, portalSize, 100, 100);
 		angle += portalSpeed;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
