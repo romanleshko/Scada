@@ -25,7 +25,7 @@
 #define PI         3.14159
 
 #define frand()			((float)rand()/RAND_MAX)
-#define MAX_PARTICULAS  200
+#define MAX_PARTICULAS  1000
 
 GLUquadricObj*  quad  = gluNewQuadric();
 
@@ -251,37 +251,35 @@ void initParticulas(Particle *particula)
  GLfloat px, py, pz;
  GLfloat ps;
 
-	px = 0.0;
-	py = 0.0;
-	pz = 0.0;
-	ps = 4.5;
-
-
+	px = 0.3;
+	py = portalHeight-1;
+	pz = -0.3;
+	ps = 0.05;
 
  for(i=0; i<MAX_PARTICULAS; i++)  {
 
 	//---------------------------------  
-	v     = 1*frand()+0.02;
+	v     = 1*frand()+100;
     theta = 2.0*frand()*M_PI;   // [0..2pi]
 	phi   = frand()*M_PI;		// [0.. pi]
     
     particula[i].size = ps ;		// tamanh de cada particula
-    particula[i].x	  = px + 0.1*frand()*px;    // [-200 200]
-    particula[i].y	  = py + 0.1*frand()*py;	// [-200 200]
-    particula[i].z	  = pz + 0.1*frand()*pz;	// [-200 200]
+    particula[i].x	  = px + 10*frand()*px;    // [-200 200]
+    particula[i].y	  = py + frand();	// [-200 200]
+    particula[i].z	  = pz + 10*frand()*pz;	// [-200 200]
         
 	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
     particula[i].vy = v * cos(phi);
     particula[i].vz = v * sin(theta) * sin(phi);
-	particula[i].ax = 0.01f;
-    particula[i].ay = -0.01f;
-    particula[i].az = 0.015f;
+	particula[i].ax = 0.3;
+    particula[i].ay = -0.3;
+    particula[i].az = 0.3;
 
 	particula[i].r = 1.0f;
 	particula[i].g = 1.0f;	
-	particula[i].b = 1.0f;	
-	particula[i].life = 1.0f;		                
-	particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
+	particula[i].b = 0.0f;	
+	particula[i].life = 10.0f;		                
+	particula[i].fade = 0.1f;	// Em 100=1/0.01 iteracoes desaparece
 	}
 }
 
@@ -446,7 +444,7 @@ void Timer(int value)
 {
 	initParticulas(particula);
 	glutPostRedisplay();
-	glutTimerFunc(milisec ,Timer, 1); 
+	glutTimerFunc(milisec ,Timer, 40); 
 }
 
 
@@ -456,6 +454,7 @@ void drawScene(){
 	initParticulas(particula);
 	
 	drawStairs();
+	showParticulas(particula, 1);
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
@@ -470,7 +469,7 @@ void drawScene(){
 	glStencilFunc(GL_ALWAYS, 0x1, 0x1);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	drawChao();
-	showParticulas(particula, 1);
+	
 	// desenhar os objectos limitado a zona do stencil buffer
 	glEnable(GL_DEPTH_TEST);
 	glColorMask(1,1,1,1);
