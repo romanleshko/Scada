@@ -83,7 +83,7 @@ GLfloat  angleRad = (sun_ang*PI)/180;
 // -----------------------------------------------------------  LUZ OBSERVADOR ---------------------------------------------------------
 GLfloat intensidade=0.0;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   
-GLint   ligaFoco=1;
+GLint   ligaFoco=0;
 GLfloat rFoco=1.1, aFoco=aVisao;
 GLfloat incH =0.0, incV=0.0;
 GLfloat incMaxH =0.5, incMaxV=0.35;   
@@ -96,14 +96,14 @@ GLfloat focoCorDif[4] ={ 1, 1, 1, 1.0};
 GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
 
 // -----------------------------------------------------------  FOCO SUN ---------------------------------------------------------
-GLfloat sunIntensity=0.2;
+GLfloat sunIntensity=0.000;
 GLfloat sunluzGlobalCorAmb[4]={sunIntensity,sunIntensity,sunIntensity,1.0};   
 GLint   luzSun=1;
-GLfloat rSun=1.1, aSun=aVisao;
+GLfloat rSun=50, aSun=aVisao;
 GLfloat sunExp   = 10.0;
-GLfloat sunCut   = 60.0;
-GLfloat sunCorDif[4] ={ 1, 1, 1, 1.0}; 
-GLfloat sunCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
+GLfloat sunCut   = 90.0;
+GLfloat sunCorDif[4] ={ 1, 0.77, 0.56, 1.0}; 
+GLfloat sunCorEsp[4] ={ 1, 0.77, 0.56, 1.0}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -140,9 +140,6 @@ void initLights(void){
 
 	GLfloat sunDir[] = { 0, -1, 0};
 
-	
-
-
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
 	glLightfv(GL_LIGHT0, GL_POSITION,      sunPini );
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,sunDir );
@@ -151,11 +148,12 @@ void initLights(void){
 	glLightfv(GL_LIGHT0, GL_DIFFUSE,       sunCorDif );
 	glLightfv(GL_LIGHT0, GL_SPECULAR,      sunCorEsp  );
 	
+	
 	if (ligaFoco)
 		glEnable(GL_LIGHT1);
 	else
 		glDisable(GL_LIGHT1);
-
+	
 	if (luzSun)
 		glEnable(GL_LIGHT0);
 	else
@@ -246,18 +244,17 @@ void initTexturas(void) {
 
 }
 
-void initParticulasSun(Particle *particula)
+void initParticulas(Particle *particula)
 {
  GLfloat v, theta, phi;
  int i;
  GLfloat px, py, pz;
  GLfloat ps;
 
- 	GLfloat angleRad = (sun_ang*PI)/180;
 
-	px = celestial_rad*cos(angleRad);
-	py = celestial_height;
-	pz = celestial_rad*sin(angleRad);
+	px = 0;
+	py = 1;
+	pz = 0;
 	ps = 0.1;
 
 
@@ -274,9 +271,9 @@ void initParticulasSun(Particle *particula)
     particula[i].z	  = pz + frand();	// [-200 200]
     
 	
-	particula[i].vx = - v * px;
-    particula[i].vy = - v * py;
-    particula[i].vz = - v * pz;
+	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
+    particula[i].vy = v * cos(phi);
+    particula[i].vz = v * sin(theta) * sin(phi);
 	particula[i].ax = - 0.01f;
     particula[i].ay = -0.01f;
     particula[i].az = - 0.015f;
@@ -285,13 +282,13 @@ void initParticulasSun(Particle *particula)
 	particula[i].r = 1.0f;
 	particula[i].g = 1.0f;	
 	particula[i].b = 1.0f;	
-	particula[i].life = 20.0f;		                
+	particula[i].life = 50.0f;		                
 	particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
 	}
 }
 
 void drawChao(){
-	glColor4f(1, 1, 1, 1.0f);
+	glColor4f(1, 1, 1, 0.5f);
 	glNormal3f(0, 1, 0);
 	glEnable(GL_TEXTURE_2D);
 	gluQuadricTexture(quad, GL_TRUE);
@@ -300,7 +297,6 @@ void drawChao(){
 
 	glPushMatrix();
 		glTranslatef(-4, -1, 0);
-		
 		glRotatef (90, -1, 0, 0);
 		gluDisk(quad, 0.0, 13.5 ,100, 100);
 	glPopMatrix();
@@ -327,7 +323,6 @@ void inicializa(void)
 	
 	initTexturas();
     initLights();
-	//initParticulasSun(particula);
 
 }
 
@@ -336,17 +331,9 @@ void drawSkySphere(){
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D,texture[0]);
-	glMaterialfv(GL_FRONT,GL_AMBIENT,  whitePlasticAmb  );
-	glMaterialfv(GL_FRONT,GL_DIFFUSE,  whitePlasticDif );
-	glMaterialfv(GL_FRONT,GL_SPECULAR, whitePlasticSpec);
-	glMaterialf (GL_FRONT,GL_SHININESS,whitePlasticCoef);
-	
-	glPushMatrix();
-		glRotatef (       90, -1, 0, 0);
-		gluQuadricDrawStyle ( quad, GLU_FILL   );
-		gluQuadricNormals   ( quad, GLU_SMOOTH );
-		gluQuadricTexture   ( quad, GL_TRUE    );
 
+	glPushMatrix();
+		glRotatef (90, -1, 0, 0);
 		glRotatef(skyAngle, 0, 0, 1);
 		gluSphere ( quad, sizeSky*1, 80, 80);
 		skyAngle += skySpeed;
@@ -357,19 +344,18 @@ void drawSkySphere(){
 void drawStairs() {
 	glEnable(GL_BLEND);
 	glColor4f(1,1,1,0.4);
+	glTranslatef(0,1,0);
 	glPushMatrix();
-	int ang = 10;
+	int ang = 10; // stairs rotation angle
 	for (int i = 0; i < N_STAIRS; i++) {
 		
 		glPushMatrix();
 			glScalef(STAIR_LENGTH, STAIR_HEIGHT, STAIR_WIDTH);
-			
 			glutSolidCube(1);
 		glPopMatrix();
 
-		glTranslatef(STAIR_LENGTH + 0.1, STAIR_HEIGHT + 0.02, 0);
+		glTranslatef(STAIR_LENGTH + 0.1, STAIR_HEIGHT + 0.05, 0);
 		glRotatef(ang ,0, 1, 0);
-		//ang += 1.2;
 	}
 	glPopMatrix();
 	glDisable(GL_BLEND);
@@ -378,30 +364,23 @@ void drawStairs() {
 void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
-	// initParticulasSun(particula);
-	GLfloat cor_spec[4]  = {0.5, 0.5, 0.5, 1};
-	GLfloat cor_emi[4] =  {0.5, 0.5, 0.5, 1};
 
+	GLfloat cor_spec[4]  = {0.5, 0.5, 0.5, 1};
+	GLfloat cor_emi[4] =  {0.3, 0.3, 0.3, 1};
+	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, cor_spec);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, cor_spec);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, cor_emi);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, cor_spec);
 	glColor3f(1,1,1);
-	//glColor3f(1,1,1);
-	//glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	//glColor3f(0,0,0);
-	//glColorMaterial(GL_FRONT, GL_EMISSION);
-	//glColor3f(1,1,1);
+
 	GLfloat angleRad = (sun_ang*PI)/180;
-
-
 
 	glPushMatrix();
 
 		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
 		sun_ang += celestial_inc;
-		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -419,7 +398,6 @@ void drawMoon(float size) {
 		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
 		moon_ang += celestial_inc;
-		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -436,18 +414,15 @@ void drawPortal()
 		glRotatef(angle, 0, 0, 1);
 		gluDisk(quad, 0, portalSize, 100, 100);
 		angle += portalSpeed;
-		//glutPostRedisplay();
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 }
 
-void showParticulasSun(Particle *particula, int sistema) {
+void showParticulas(Particle *particula, int sistema) {
  int i;
- int numero;
 
- numero=(int) (frand()*10.0);
- 
+
  for (i=0; i<MAX_PARTICULAS; i++)
 	{
 
@@ -465,22 +440,28 @@ void showParticulasSun(Particle *particula, int sistema) {
     particula[i].vy += particula[i].ay;
     particula[i].vz += particula[i].az;
 	particula[i].life -= particula[i].fade;	
-	
-	if (particula[i].life < 0) initParticulasSun(particula);
 	}
 
 }
 
+void Timer(int value) 
+{
+	initParticulas(particula);
+	glutPostRedisplay();
+	glutTimerFunc(milisec ,Timer, 1); 
+}
+
+
 void drawScene(){
 
 	initLights();
+	initParticulas(particula);
 	
 	drawStairs();
 	drawSun(celestial_size);
 	drawMoon(celestial_size);
 	drawSkySphere();
 	drawPortal();
-	showParticulasSun(particula, 1);
 
 	// REFLECTIONS
 	glDisable(GL_DEPTH_TEST);
@@ -491,7 +472,7 @@ void drawScene(){
 	glStencilFunc(GL_ALWAYS, 0x1, 0x1);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	drawChao();
-
+	showParticulas(particula, 1);
 	// desenhar os objectos limitado a zona do stencil buffer
 	glEnable(GL_DEPTH_TEST);
 	glColorMask(1,1,1,1);
@@ -499,13 +480,15 @@ void drawScene(){
 	glStencilFunc(GL_EQUAL, 1 ,1 );
 	glPushMatrix();
 		glScalef(1,-1,1);
-		//drawStairs();
+		drawStairs();
 		//drawSpring(0.05, 0.5, 20);
 		drawSun(celestial_size);
+		//drawPortal();
 		drawMoon(celestial_size);		
 		//drawSkySphere();	
 	glPopMatrix();
 
+	
 
 	glDisable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
@@ -662,20 +645,9 @@ void teclasNotAscii(int key, int x, int y)
     
 void idle(void)
 {
-
- glutPostRedisplay();
-
-}
-
-/*
-void Timer(int value) 
-{
-	initParticulasSun(particula);
-
 	glutPostRedisplay();
-	glutTimerFunc(milisec ,Timer, 10);   //.. Espera msecDelay milisegundos
 }
-*/
+
 
 
 
@@ -695,8 +667,8 @@ int main(int argc, char** argv){
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 	glutIdleFunc(idle);
- 	//glutTimerFunc(milisec , Timer, 1);     //.. função callback
-    
+ 	
+    glutTimerFunc(milisec , Timer, 1);
     glutMainLoop();
     
     return 0;
