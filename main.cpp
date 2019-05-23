@@ -251,38 +251,36 @@ void initParticulas(Particle *particula)
  GLfloat px, py, pz;
  GLfloat ps;
 
+	px = 0.0;
+	py = 0.0;
+	pz = 0.0;
+	ps = 4.5;
 
-	px = 0;
-	py = 1;
-	pz = 0;
-	ps = 0.1;
 
 
- for(i=0; i < MAX_PARTICULAS; i++)  {
+ for(i=0; i<MAX_PARTICULAS; i++)  {
 
 	//---------------------------------  
 	v     = 1*frand()+0.02;
     theta = 2.0*frand()*M_PI;   // [0..2pi]
 	phi   = frand()*M_PI;		// [0.. pi]
     
-    particula[i].size = ps;  // tamanh de cada particula
-    particula[i].x	  = px + frand();     // [-200 200]
-    particula[i].y	  = py + frand();	// [-200 200]
-    particula[i].z	  = pz + frand();	// [-200 200]
-    
-	
+    particula[i].size = ps ;		// tamanh de cada particula
+    particula[i].x	  = px + 0.1*frand()*px;    // [-200 200]
+    particula[i].y	  = py + 0.1*frand()*py;	// [-200 200]
+    particula[i].z	  = pz + 0.1*frand()*pz;	// [-200 200]
+        
 	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
     particula[i].vy = v * cos(phi);
     particula[i].vz = v * sin(theta) * sin(phi);
-	particula[i].ax = - 0.01f;
+	particula[i].ax = 0.01f;
     particula[i].ay = -0.01f;
-    particula[i].az = - 0.015f;
-	
+    particula[i].az = 0.015f;
 
 	particula[i].r = 1.0f;
 	particula[i].g = 1.0f;	
 	particula[i].b = 1.0f;	
-	particula[i].life = 50.0f;		                
+	particula[i].life = 1.0f;		                
 	particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
 	}
 }
