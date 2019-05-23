@@ -14,7 +14,7 @@
 #define RED         1.0, 0.0, 0.0, 1.0
 #define YELLOW     1.0, 1.0, 0.0, 1.0
 #define GREEN    0.0, 1.0, 0.0, 1.0
-#define GRAY     0.5, 0.5, 0.5, 1.0
+#define GRAY     0.3, 0.3, 0.3, 1.0
 
 #define WHITE 1.0, 1.0, 1.0, 1.0
 
@@ -47,50 +47,12 @@ GLint    milisec = 1000;
 GLfloat   STAIR_WIDTH = 5;
 GLfloat   STAIR_HEIGHT = 0.3;
 GLfloat   STAIR_LENGTH = 1;
-GLuint   N_STAIRS = 35;
+GLuint    N_STAIRS = 35;
 
 //skybox
 GLfloat         sizeSky  = 15;
 GLfloat skyAngle = 0.0;
 GLfloat skySpeed = 0.25;
-
-
-//------------------------------------------------------------ Sistema Coordenadas + objectos
-GLint          wScreen=1400, hScreen=1000;           //.. janela (pixeis)
-GLfloat        xC=40.0, yC=100.0, zC=100.0;        //.. Mundo  (unidades mundo)
-
-//------------------------------------------------------------ Observador
-GLfloat  rVisao=3.0, aVisao=0.5*PI, incVisao=0.1;
-GLfloat  angPersp=109.0;
-GLfloat  obsPini[] ={-5, 5, 0};
-GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisao*sin(aVisao)};
-
-
-// LUZ
-
-GLfloat intensidade=0.0;
-GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   // 
-
-GLint   ligaFoco=1;
-GLint	luzAmbiente=1;
-
-GLfloat rFoco=1.1, aFoco=aVisao;
-GLfloat incH =0.0, incV=0.0;
-GLfloat incMaxH =0.5, incMaxV=0.35;   
-GLfloat focoPini[]= { obsPini[0], obsPini[1], obsPini[2], 1.0 };
-GLfloat focoPfin[]= { obsPini[0]-rFoco*cos(aFoco), obsPini[1], obsPini[2]-rFoco*sin(aFoco), 1.0};
-GLfloat focoDir[] = { focoPfin[0]-focoPini[0], 0, focoPfin[2]-focoPini[2]};
-GLfloat focoExp   = 10.0;
-GLfloat focoCut   = 60.0;
-
-GLfloat focoCorDif[4] ={ 1, 1, 1, 1.0}; 
-GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
-
-
-
-// TEXTURAS
-GLuint   texture[10];
-RgbImage imag;
 
 // SUN & MOON
 GLfloat celestial_size = 1;
@@ -100,6 +62,54 @@ GLfloat moon_ang = 270;
 GLfloat celestial_inc = -0.25;
 GLfloat celestial_height = 7.5;
 
+//------------------------------------------------------------ Sistema Coordenadas + objectos
+GLint          wScreen=1400, hScreen=1000;           //.. janela (pixeis)
+GLfloat        xC=40.0, yC=100.0, zC=100.0;        //.. Mundo  (unidades mundo)
+
+//------------------------------------------------------------ Pos Observador ------------------------------------------------------
+GLfloat  rVisao=3.0, aVisao=0.5*PI, incVisao=0.1;
+GLfloat  angPersp=109.0;
+GLfloat  obsPini[] ={-5, 5, 0};
+GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisao*sin(aVisao)};
+
+
+// ----------------------------------------------------------- Pos Sol --------------------------------------------------------------
+
+// LUZ SOL
+GLfloat  SunrVisao=3.0, SunaVisao=0.5*PI, SunincVisao=0.1;
+GLfloat  SunangPersp=109.0;
+GLfloat  angleRad = (sun_ang*PI)/180;
+GLint	luzSun=1;
+GLfloat  sunPini[] ={celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
+GLfloat  sunPfin[] ={celestial_rad*cos(angleRad), 0, celestial_rad*sin(angleRad)};
+
+// -----------------------------------------------------------  LUZ OBSERVADOR e SOL ---------------------------------------------------------
+GLfloat intensidade=0.0;
+GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   
+GLint   ligaFoco=1;
+GLfloat rFoco=1.1, aFoco=aVisao;
+GLfloat incH =0.0, incV=0.0;
+GLfloat incMaxH =0.5, incMaxV=0.35;   
+GLfloat focoPini[]= { obsPini[0], obsPini[1], obsPini[2], 1.0 };
+GLfloat focoPfin[]= { obsPini[0]-rFoco*cos(aFoco), obsPini[1], obsPini[2]-rFoco*sin(aFoco), 1.0};
+GLfloat focoDir[] = { focoPfin[0]-focoPini[0], 0, focoPfin[2]-focoPini[2]};
+GLfloat focoExp   = 10.0;
+GLfloat focoCut   = 60.0;
+GLfloat focoCorDif[4] ={ 1, 1, 1, 1.0}; 
+GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
+
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// TEXTURAS
+GLuint   texture[10];
+RgbImage imag;
+
 // PORTAL
 GLfloat angle = 0.0;
 GLfloat portalSize = 5;
@@ -107,43 +117,40 @@ GLfloat portalHeight = 12;
 GLfloat portalSpeed = -0.25;
 
 
-
-
 //========================================================= ILUMINACAO                 
 void initLights(void){
 
-	// FOCO
+	// FOCO - Observador
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
 	glLightfv(GL_LIGHT1, GL_POSITION,      focoPini );
 	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION,focoDir );
 	glLightf (GL_LIGHT1, GL_SPOT_EXPONENT ,focoExp);
     glLightf (GL_LIGHT1, GL_SPOT_CUTOFF,   focoCut);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE,       focoCorDif );   
+	glLightfv(GL_LIGHT1, GL_DIFFUSE,       focoCorDif );
 	glLightfv(GL_LIGHT1, GL_SPECULAR,      focoCorEsp  );
 
-	// Pontual
-	GLfloat angleRad = (sun_ang*PI)/180;
+	// FOCO - Sol
+	angleRad = (sun_ang*PI)/180;
 
-	GLfloat pos_ilum[3] = {celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad)};
-	
-	GLfloat cor_dif[4]  = {WHITE};
-	GLfloat cor_spec[4] = {BLACK};
-	GLfloat cor_amb[4] =  {BLACK};
-	GLfloat cor_emi[4] =  {BLACK};
+	GLfloat sunPini[3] = {celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
 
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,  cor_dif);
-	glLightfv(GL_LIGHT0, GL_EMISSION, cor_emi);
-	glLightfv(GL_LIGHT0, GL_AMBIENT,  cor_amb);
-	glLightfv(GL_LIGHT0, GL_POSITION, pos_ilum);
-	glLightfv(GL_LIGHT2, GL_SPECULAR, cor_spec);
+	GLfloat sunDir[] = { 0, -1, 0};
 
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
+	glLightfv(GL_LIGHT0, GL_POSITION,      sunPini );
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,sunDir );
+	glLightf (GL_LIGHT0, GL_SPOT_EXPONENT ,focoExp);
+    glLightf (GL_LIGHT0, GL_SPOT_CUTOFF,   focoCut);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,       focoCorDif );
+	glLightfv(GL_LIGHT0, GL_SPECULAR,      focoCorEsp  );
 	
 	if (ligaFoco)
 		glEnable(GL_LIGHT1);
 	else
 		glDisable(GL_LIGHT1);
 
-	if (luzAmbiente)
+	if (luzSun)
 		glEnable(GL_LIGHT0);
 	else
 		glDisable(GL_LIGHT0);
@@ -278,8 +285,8 @@ void initParticulasSun(Particle *particula)
 }
 
 void drawChao(){
-	glColor4f(1, 1, 1, 0.9f);
-	
+	glColor4f(1, 1, 1, 1.0f);
+	glNormal3f(0, 1, 0);
 	glEnable(GL_TEXTURE_2D);
 	gluQuadricTexture(quad, GL_TRUE);
 	gluQuadricDrawStyle(quad, GLU_FILL);
@@ -314,7 +321,7 @@ void inicializa(void)
 	
 	initTexturas();
     initLights();
-	initParticulasSun(particula);
+	//initParticulasSun(particula);
 
 }
 
@@ -365,9 +372,9 @@ void drawStairs() {
 void drawSun(float size) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[4]);
-	initParticulasSun(particula);
-	GLfloat cor_spec[4]  = {0.1, 0.1, 0.1, 1};
-	GLfloat cor_emi[4] =  {0.1, 0.1, 0.1, 1};
+	// initParticulasSun(particula);
+	GLfloat cor_spec[4]  = {0.5, 0.5, 0.5, 1};
+	GLfloat cor_emi[4] =  {0.5, 0.5, 0.5, 1};
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, cor_spec);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, cor_spec);
@@ -452,6 +459,8 @@ void showParticulasSun(Particle *particula, int sistema) {
     particula[i].vy += particula[i].ay;
     particula[i].vz += particula[i].az;
 	particula[i].life -= particula[i].fade;	
+	
+	if (particula[i].life < 0) initParticulasSun(particula);
 	}
 
 }
@@ -586,7 +595,7 @@ void keyboard(unsigned char key, int x, int y){
 
 	case 't':
 	case 'T':
-		luzAmbiente = !luzAmbiente;
+		luzSun = !luzSun;
 		glutPostRedisplay();
 		break;
 
@@ -679,7 +688,7 @@ int main(int argc, char** argv){
     glutSpecialFunc(teclasNotAscii);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-	 glutIdleFunc(idle);
+	glutIdleFunc(idle);
  	//glutTimerFunc(milisec , Timer, 1);     //.. função callback
     
     glutMainLoop();
