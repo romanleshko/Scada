@@ -79,11 +79,8 @@ GLfloat  obsPfin[] ={obsPini[0]-rVisao*cos(aVisao), obsPini[1], obsPini[2]-rVisa
 GLfloat  SunrVisao=3.0, SunaVisao=0.5*PI, SunincVisao=0.1;
 GLfloat  SunangPersp=109.0;
 GLfloat  angleRad = (sun_ang*PI)/180;
-GLint	luzSun=1;
-GLfloat  sunPini[] ={celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
-GLfloat  sunPfin[] ={celestial_rad*cos(angleRad), 0, celestial_rad*sin(angleRad)};
 
-// -----------------------------------------------------------  LUZ OBSERVADOR e SOL ---------------------------------------------------------
+// -----------------------------------------------------------  LUZ OBSERVADOR ---------------------------------------------------------
 GLfloat intensidade=0.0;
 GLfloat luzGlobalCorAmb[4]={intensidade,intensidade,intensidade,1.0};   
 GLint   ligaFoco=1;
@@ -98,8 +95,15 @@ GLfloat focoCut   = 60.0;
 GLfloat focoCorDif[4] ={ 1, 1, 1, 1.0}; 
 GLfloat focoCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
 
-
-
+// -----------------------------------------------------------  FOCO SUN ---------------------------------------------------------
+GLfloat sunIntensity=0.2;
+GLfloat sunluzGlobalCorAmb[4]={sunIntensity,sunIntensity,sunIntensity,1.0};   
+GLint   luzSun=1;
+GLfloat rSun=1.1, aSun=aVisao;
+GLfloat sunExp   = 10.0;
+GLfloat sunCut   = 60.0;
+GLfloat sunCorDif[4] ={ 1, 1, 1, 1.0}; 
+GLfloat sunCorEsp[4] ={ 1.0, 1.0, 1.0, 1.0}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -132,18 +136,20 @@ void initLights(void){
 	// FOCO - Sol
 	angleRad = (sun_ang*PI)/180;
 
-	GLfloat sunPini[3] = {celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad)};
+	GLfloat sunPini[] = {celestial_rad*cos(angleRad), 7.5, celestial_rad*sin(angleRad), 1.0f};
 
 	GLfloat sunDir[] = { 0, -1, 0};
+
+	
 
 
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
 	glLightfv(GL_LIGHT0, GL_POSITION,      sunPini );
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,sunDir );
-	glLightf (GL_LIGHT0, GL_SPOT_EXPONENT ,focoExp);
-    glLightf (GL_LIGHT0, GL_SPOT_CUTOFF,   focoCut);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,       focoCorDif );
-	glLightfv(GL_LIGHT0, GL_SPECULAR,      focoCorEsp  );
+	glLightf (GL_LIGHT0, GL_SPOT_EXPONENT ,sunExp);
+    glLightf (GL_LIGHT0, GL_SPOT_CUTOFF,   sunCut);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,       sunCorDif );
+	glLightfv(GL_LIGHT0, GL_SPECULAR,      sunCorEsp  );
 	
 	if (ligaFoco)
 		glEnable(GL_LIGHT1);
