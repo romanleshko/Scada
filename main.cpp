@@ -52,14 +52,13 @@ GLuint    N_STAIRS = 35;
 //skybox
 GLfloat         sizeSky  = 15;
 GLfloat skyAngle = 0.0;
-GLfloat skySpeed = 0.25;
+GLfloat rotationSpeed = 0.25;
 
 // SUN & MOON
 GLfloat celestial_size = 1;
 GLfloat celestial_rad = 7.5;
 GLfloat sun_ang = 90;
 GLfloat moon_ang = 270;
-GLfloat celestial_inc = -0.25;
 GLfloat celestial_height = 7.5;
 
 //------------------------------------------------------------ Sistema Coordenadas + objectos
@@ -118,7 +117,6 @@ RgbImage imag;
 GLfloat angle = 0.0;
 GLfloat portalSize = 5;
 GLfloat portalHeight = 12;
-GLfloat portalSpeed = -0.25;
 
 
 //========================================================= ILUMINACAO                 
@@ -332,7 +330,7 @@ void drawSkySphere(){
 		glRotatef (90, -1, 0, 0);
 		glRotatef(skyAngle, 0, 0, 1);
 		gluSphere ( quad, sizeSky*1, 80, 80);
-		skyAngle += skySpeed;
+		skyAngle += rotationSpeed;
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);			
 };
@@ -376,7 +374,7 @@ void drawSun(float size) {
 
 		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
-		sun_ang += celestial_inc;
+		sun_ang -= rotationSpeed;
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -393,7 +391,7 @@ void drawMoon(float size) {
 
 		glTranslatef(celestial_rad*cos(angleRad), celestial_height, celestial_rad*sin(angleRad));
 		gluSphere(quad, size, 100, 100);
-		moon_ang += celestial_inc;
+		moon_ang -= rotationSpeed;
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -409,7 +407,7 @@ void drawPortal()
 		glRotatef(90, 1, 0, 0);
 		glRotatef(angle, 0, 0, 1);
 		gluDisk(quad, 0, portalSize, 100, 100);
-		angle += portalSpeed;
+		angle -= rotationSpeed;
 
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -607,6 +605,15 @@ void keyboard(unsigned char key, int x, int y){
 	case 'a': case 'A':
 		obsPini[1]=obsPini[1]-1;
 		glutPostRedisplay();	
+	break;
+
+	case 'L': case 'l':
+		rotationSpeed -= 0.05;
+		glutPostRedisplay();
+	break;
+	case 'M': case 'm':
+		rotationSpeed += 0.05;
+		glutPostRedisplay();
 	break;
 	
 		//--------------------------- Escape
