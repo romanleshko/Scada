@@ -244,40 +244,45 @@ void initTexturas(void) {
 
 void initParticulas(Particle *particula)
 {
- GLfloat v, theta, phi;
- int i;
- GLfloat px, py, pz;
- GLfloat ps;
+	 GLfloat v, theta, phi;
+	int i;
+	GLfloat px, py, pz;
+	GLfloat ps;
+	GLfloat radius = 0.5;
 
-	px = 0.3;
+	px = 0.0;
 	py = portalHeight-1;
-	pz = -0.3;
-	ps = 0.05;
+	pz = 0.0;
+	ps = 0.25;
 
- for(i=0; i<MAX_PARTICULAS; i++)  {
 
-	//---------------------------------  
-	v     = 1*frand()+100;
-    theta = 2.0*frand()*M_PI;   // [0..2pi]
-	phi   = frand()*M_PI;		// [0.. pi]
-    
-    particula[i].size = ps ;		// tamanh de cada particula
-    particula[i].x	  = px + 10*frand()*px;    // [-200 200]
-    particula[i].y	  = py + frand();	// [-200 200]
-    particula[i].z	  = pz + 10*frand()*pz;	// [-200 200]
-        
-	particula[i].vx = v * cos(theta) * sin(phi);	// esferico
-    particula[i].vy = v * cos(phi);
-    particula[i].vz = v * sin(theta) * sin(phi);
-	particula[i].ax = 0.3;
-    particula[i].ay = -0.3;
-    particula[i].az = 0.3;
 
-	particula[i].r = 1.0f;
-	particula[i].g = 1.0f;	
-	particula[i].b = 0.0f;	
-	particula[i].life = 10.0f;		                
-	particula[i].fade = 0.1f;	// Em 100=1/0.01 iteracoes desaparece
+	for(i=0; i<MAX_PARTICULAS; i++)  {
+
+		v     = 0.1;
+
+		//---------------------------------  
+		theta = 2.0*M_PI + i*2;   // [0..2pi]
+		
+		particula[i].size = ps ;		// tamanh de cada particula
+		particula[i].x	  = radius*cos(theta);    //
+		particula[i].y	  = py + 0.1*frand()*py;	//
+		particula[i].z	  = radius*sin(theta);	//
+			
+		particula[i].vx = v * cos(theta);	// esferico
+		particula[i].vy = 0;
+		particula[i].vz = v * sin(theta);
+		particula[i].ax = 0.0f;
+		particula[i].ay = 0;
+		particula[i].az = 0.0f;
+
+		particula[i].r = 1.0f;
+		particula[i].g = 1.0f;	
+		particula[i].b = 1.0f;	
+		particula[i].life = 0.25f;		                
+		particula[i].fade = 0.001f;	// Em 100=1/0.01 iteracoes desaparece
+
+		radius += 0.01;
 	}
 }
 
@@ -414,26 +419,24 @@ void drawPortal()
 }
 
 void showParticulas(Particle *particula, int sistema) {
- int i;
 
+	for (int i=0; i<MAX_PARTICULAS; i++) {
 
- for (i=0; i<MAX_PARTICULAS; i++)
-	{
+		glColor4f(1,1,1, particula[i].life);
 
-	glColor4f(1,1,1, particula[i].life);
- 	glBegin(GL_QUADS);				        
-		glTexCoord2d(0,0); glVertex3f(particula[i].x -particula[i].size, particula[i].y -particula[i].size, particula[i].z);      
-		glTexCoord2d(1,0); glVertex3f(particula[i].x +particula[i].size, particula[i].y -particula[i].size, particula[i].z);        
-		glTexCoord2d(1,1); glVertex3f(particula[i].x +particula[i].size, particula[i].y +particula[i].size, particula[i].z);            
-		glTexCoord2d(0,1); glVertex3f(particula[i].x -particula[i].size, particula[i].y +particula[i].size, particula[i].z);       
-	glEnd();	
-	particula[i].x += particula[i].vx;
-    particula[i].y += particula[i].vy;
-    particula[i].z += particula[i].vz;
-    particula[i].vx += particula[i].ax;
-    particula[i].vy += particula[i].ay;
-    particula[i].vz += particula[i].az;
-	particula[i].life -= particula[i].fade;	
+		glBegin(GL_QUADS);				        
+			glTexCoord2d(0,0); glVertex3f(particula[i].x -particula[i].size, particula[i].y -particula[i].size, particula[i].z);      
+			glTexCoord2d(1,0); glVertex3f(particula[i].x +particula[i].size, particula[i].y -particula[i].size, particula[i].z);        
+			glTexCoord2d(1,1); glVertex3f(particula[i].x +particula[i].size, particula[i].y +particula[i].size, particula[i].z);            
+			glTexCoord2d(0,1); glVertex3f(particula[i].x -particula[i].size, particula[i].y +particula[i].size, particula[i].z);       
+		glEnd();	
+		particula[i].x += particula[i].vx;
+		particula[i].y += particula[i].vy;
+		particula[i].z += particula[i].vz;
+		particula[i].vx += particula[i].ax;
+		particula[i].vy += particula[i].ay;
+		particula[i].vz += particula[i].az;
+		particula[i].life -= particula[i].fade;	
 	}
 
 }
@@ -449,7 +452,7 @@ void Timer(int value)
 void drawScene(){
 
 	initLights();
-	initParticulas(particula);
+	//initParticulas(particula);
 	
 	drawStairs();
 	showParticulas(particula, 1);
